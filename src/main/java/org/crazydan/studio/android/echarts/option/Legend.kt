@@ -1,65 +1,64 @@
 package org.crazydan.studio.android.echarts.option
 
 import org.crazydan.studio.android.echarts.EChartsOption
-import org.crazydan.studio.android.echarts.EChartsOptions
 import org.crazydan.studio.android.echarts.JSONable
 
 /**
- * https://echarts.apache.org/en/option.html#legend
+ * [说明文档](https://echarts.apache.org/en/option.html#legend)
  *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-06
  */
-fun EChartsOptions.legend(
-    show: Boolean = true,
-    type: LegendType = LegendType.Plain,
+@EChartsOption
+class Legend : JSONable {
+    private val holder = LegendHolder()
 
-    /** https://echarts.apache.org/en/option.html#legend.data */
-    data: List<LegendData>? = null,
+    enum class Type() {
+        Plain, Scroll
+    }
 
-    /** https://echarts.apache.org/en/option.html#legend.formatter */
-    formatter: String? = null,
+    override fun toJSON(): String = holder.toJSON()
 
-    left: Size? = null,
-    right: Size? = null,
-    top: Size? = null,
-    bottom: Size? = null,
-): EChartsOptions = this.add(
-    LegendOption(
-        legend = Legend(
-            show = show,
-            type = type,
-            data = data,
-            formatter = formatter,
-            left = left,
-            right = right,
-            top = top,
-            bottom = bottom,
-        )
-    )
-)
+    /** 是否显示 */
+    fun show(value: Boolean) {
+        holder.show = value
+    }
 
-private data class LegendOption(
-    val legend: Legend,
-) : EChartsOption
+    /** 图例类型 */
+    fun type(block: LegendType.() -> Unit) {
+        LegendType(holder).apply(block)
+    }
 
-private data class Legend(
-    val show: Boolean,
-    val type: LegendType,
-    val data: List<LegendData>?,
-    val formatter: String?,
-    val left: Size?,
-    val right: Size?,
-    val top: Size?,
-    val bottom: Size?,
-) : JSONable
+    /** 文本格式化器 */
+    fun formatter(value: String) {
+        holder.formatter = value
+    }
 
-/** https://echarts.apache.org/en/option.html#legend.data */
-data class LegendData(
-    val name: String,
-) : JSONable
-
-/** https://echarts.apache.org/en/option.html#legend.type */
-enum class LegendType() {
-    Plain, Scroll
+    /** 与容器周边的间隔 */
+    fun margin(block: Margin.() -> Unit) {
+        Margin(holder).apply(block)
+    }
 }
+
+@EChartsOption
+class LegendType(
+    val holder: LegendHolder,
+) {
+
+    /** 普通类型：平铺展开图例 */
+    fun plain() {
+        holder.type = Legend.Type.Plain
+    }
+
+    /** 滚动翻页类型。当图例数量较多时可以使用 */
+    fun scroll() {
+        holder.type = Legend.Type.Scroll
+    }
+}
+
+data class LegendHolder(
+    var show: Boolean = true,
+    var type: Legend.Type = Legend.Type.Plain,
+
+    var formatter: String? = null,
+) : MarginHolder()

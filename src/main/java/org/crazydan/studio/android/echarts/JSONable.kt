@@ -27,6 +27,11 @@ fun mapToJSON(map: Map<Any, Any?>): String =
 fun listToJSON(list: Collection<*>): String =
     jsonValue(list)
 
+fun enumToJSON(enum: Enum<*>): String {
+    val name = enum.name.replaceFirstChar { it.lowercase() }
+    return "\"$name\""
+}
+
 fun objToMap(obj: Any): Map<String, Any> =
     obj::class.memberProperties
         .map { prop ->
@@ -74,8 +79,7 @@ private fun jsonValue(value: Any?): String {
         }
 
         is Enum<*> -> {
-            val name = value.name.replaceFirstChar { it.lowercase() }
-            "\"$name\""
+            enumToJSON(value)
         }
 
         is Map<*, *> -> {

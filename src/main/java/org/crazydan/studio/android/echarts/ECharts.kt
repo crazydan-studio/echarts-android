@@ -1,135 +1,72 @@
 package org.crazydan.studio.android.echarts
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Color
-import android.webkit.JavascriptInterface
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.FrameLayout
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
+import org.crazydan.studio.android.echarts.option.Grid
+import org.crazydan.studio.android.echarts.option.Legend
+import org.crazydan.studio.android.echarts.option.Tooltip
+import org.crazydan.studio.android.echarts.option.XAxis
+import org.crazydan.studio.android.echarts.option.YAxis
 
 /**
  *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-05
  */
-@Composable
-fun ECharts(
-    options: EChartsOptions,
-    modifier: Modifier = Modifier,
-    useDarkTheme: Boolean = false,
-) {
-    var isChartReady by remember { mutableStateOf(false) }
+@DslMarker
+annotation class EChartsOption
 
-    AndroidView(
-        modifier = modifier,
-//        modifier = Modifier.fillMaxSize(),
-        factory = { ctx ->
-            EChartsView(ctx, useDarkTheme).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                listener = EChartsViewListener(
-                    onChartReady = { isChartReady = true },
-                )
-            }
-        },
-        // Note: 视图重组时会调用该接口
-        update = { view ->
-            if (isChartReady) {
-                view.updateChartOptions(options)
-            }
-        },
-    )
-}
+interface ECharts {
 
-@SuppressLint("ViewConstructor")
-private class EChartsView(
-    context: Context,
-    useDarkTheme: Boolean,
-) : WebView(context) {
-    var listener: EChartsViewListener? = null
+    companion object : ECharts {
 
-    init {
-        initConfiguration()
-        initWebViewClient(useDarkTheme)
+        fun option(block: Option.() -> Unit): Option = Option().apply(block)
     }
 
-    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
-    private fun initConfiguration() {
-        if (isInEditMode) return
+    @EChartsOption
+    class Option : JSONable {
+        private val holder = OptionHolder()
 
-        settings.javaScriptEnabled = true
-        settings.domStorageEnabled = true
-        settings.allowFileAccess = false
-        settings.allowContentAccess = false
-        settings.blockNetworkLoads = true
-        settings.blockNetworkImage = true
-        settings.builtInZoomControls = false
-        settings.javaScriptCanOpenWindowsAutomatically = false
-        settings.allowFileAccessFromFileURLs = false
-        settings.allowUniversalAccessFromFileURLs = false
+        override fun toJSON(): String = holder.toJSON()
 
-        setWebContentsDebuggingEnabled(true)
-        setBackgroundColor(Color.TRANSPARENT)
-
-        // 向 js 传递当前对象并命名，在 js 中通过 window.<objName>
-        // 可调用该对象中 @JavascriptInterface 标注的方法
-        addJavascriptInterface(this, "__ChartWrapper__")
-    }
-
-    private fun initWebViewClient(useDarkTheme: Boolean) {
-        loadUrl("file:///android_asset/echarts/index.html")
-
-        webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-
-                safeEvaluateJavaScript("initChart($useDarkTheme)")
-            }
+        /** [提示框配置](https://echarts.apache.org/en/option.html#tooltip) */
+        fun tooltip(block: Tooltip.() -> Unit) {
+            holder.tooltip = Tooltip().apply(block)
         }
-    }
 
-    // <<<<<<<<<<<<<<<<<<<<<<<<< js 回调函数
-    @JavascriptInterface
-    fun onChartReady() {
-        listener?.onChartReady?.invoke()
-    }
+        /** [图例配置](https://echarts.apache.org/en/option.html#legend) */
+        fun legend(block: Legend.() -> Unit) {
+            holder.legend = Legend().apply(block)
+        }
 
-    @JavascriptInterface
-    fun onChartRendered() {
-        listener?.onChartRendered?.invoke()
-    }
-    // >>>>>>>>>>>>>>>>>>>>>>>>> js 回调函数
+        /**
+         * [Grid 配置](https://echarts.apache.org/en/option.html#grid)
+         *
+         * Grid 是一个矩形容器，用于绘制二维直角坐标系（`cartesian2d`）。
+         * 一个 `cartesian2d` 坐标系由一个 `xAxis` 和一个 `yAxis` 构成。
+         * 一个 Grid 中可以存在多个 `cartesian2d` 坐标系。
+         * 即，一个 Grid 可以配置多个 `xAxis` 和多个 `yAxis`
+         *
+         * 可以在 Grid 中绘制例折线图、柱状图、散点图（气泡图）等
+         */
+        fun grid(block: Grid.() -> Unit) {
+            holder.grid = Grid().apply(block)
+        }
 
-    // <<<<<<<<<<<<<<<<<<<<<<<<< 图表更新函数
-    fun updateChartOptions(options: EChartsOptions) {
-        val json = options.toJSON().replace("'", "\\'")
+        /** [X 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
+        fun xAxis(block: XAxis.() -> Unit) {
+            holder.xAxis = XAxis().apply(block)
+        }
 
-        safeEvaluateJavaScript("updateChartOptions('$json')")
-    }
-    // >>>>>>>>>>>>>>>>>>>>>>>>> 图表更新函数
-
-    private fun safeEvaluateJavaScript(js: String) {
-        if (isInEditMode) return
-
-        evaluateJavascript("javascript:$js") {
+        /** [Y 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
+        fun yAxis(block: YAxis.() -> Unit) {
+            holder.yAxis = YAxis().apply(block)
         }
     }
 }
 
-private class EChartsViewListener(
-    /** 图表已就绪，可以调用回调、更新配置、更新数据等 */
-    val onChartReady: (() -> Unit)? = null,
-
-    /** 图表数据已渲染完毕：动画等可能还在继续 */
-    val onChartRendered: (() -> Unit)? = null,
-)
+private data class OptionHolder(
+    var tooltip: Tooltip? = null,
+    var legend: Legend? = null,
+    var grid: Grid? = null,
+    var xAxis: XAxis? = null,
+    var yAxis: YAxis? = null,
+) : JSONable
