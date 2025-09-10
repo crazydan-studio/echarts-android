@@ -24,14 +24,9 @@ class Tooltip : JSONable {
         holder.show = value
     }
 
-    /** 数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。默认为该触发方式 */
-    fun triggerByItem() {
-        holder.trigger = TriggerType.Item
-    }
-
-    /** 坐标轴触发，主要在柱状图，折线图等会使用类目轴的图表中使用 */
-    fun triggerByAxis() {
-        holder.trigger = TriggerType.Axis
+    /** 触发方式 */
+    fun triggerBy(block: AxisTrigger.() -> Unit) {
+        AxisTrigger(holder).apply(block)
     }
 
     /** [坐标轴指示器配置](https://echarts.apache.org/en/option.html#tooltip.axisPointer) */
@@ -69,7 +64,7 @@ class AxisPointer : JSONable {
 
 @EChartsOption
 class AxisPointerType(
-    val holder: AxisPointerHolder,
+    private val holder: AxisPointerHolder,
 ) {
 
     /** 直线指示器：与 x 轴垂直的虚线 */
@@ -88,7 +83,23 @@ class AxisPointerType(
     }
 }
 
-private data class TooltipHolder(
+@EChartsOption
+class AxisTrigger(
+    private val holder: TooltipHolder,
+) {
+
+    /** 数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。默认为该触发方式 */
+    fun item() {
+        holder.trigger = Tooltip.TriggerType.Item
+    }
+
+    /** 坐标轴触发，主要在柱状图，折线图等会使用类目轴的图表中使用 */
+    fun axis() {
+        holder.trigger = Tooltip.TriggerType.Axis
+    }
+}
+
+data class TooltipHolder(
     var show: Boolean = true,
 
     var trigger: Tooltip.TriggerType = Tooltip.TriggerType.Item,

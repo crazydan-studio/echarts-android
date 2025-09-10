@@ -18,7 +18,7 @@ inline val Float.percent: Size
 
 @EChartsOption
 class Margin(
-    val holder: MarginHolder,
+    private val holder: MarginHolder,
 ) {
 
     /** 左侧的间距 */

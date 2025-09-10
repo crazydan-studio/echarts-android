@@ -10,13 +10,13 @@ import org.junit.Test
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-08
  */
-class EChartsOptionsTest {
+class EChartsOptionTest {
 
     @Test
     fun test_toJSON() {
         val option = ECharts.option {
             tooltip {
-                triggerByAxis()
+                triggerBy { axis() }
                 axisPointer {
                     type { cross() }
                 }
@@ -27,29 +27,37 @@ class EChartsOptionsTest {
                     top(20.pixel)
                 }
             }
-            grid {
+            grid(id = "grid:0") {
                 showBorder(false)
                 margin {
                     left(10f.percent)
                     right(10f.percent)
                     bottom(15f.percent)
                 }
-            }
-            xAxis {
-                type { category() }
-            }
-            yAxis {
-                type { value { fromZero(true) } }
+
+                xAxis(id = "grid:0:x:0") {
+                    position { bottom(5) }
+                    axisTick { alignWithLabel(true) }
+
+                    type {
+                        category {
+                            data {
+                                listOf(
+                                    item("2021-10-11"),
+                                    item("2021-10-12"),
+                                )
+                            }
+                        }
+                    }
+                }
+                yAxis(id = "grid:0:y:0") {
+                    type { value { fromZero(true) } }
+                    position { left() }
+                }
             }
         }
 
-        val options = EChartsOptions.xAxis(
-            type = AxisType.Category,
-            data = listOf(
-                AxisData(value = "2021-10-11"),
-                AxisData(value = "2021-10-12"),
-            ),
-        ).dataZoom(
+        val options = EChartsOptions.dataZoom(
             type = DataZoomType.Slider,
             top = Size.percent(90f),
             startValueIndex = 0,

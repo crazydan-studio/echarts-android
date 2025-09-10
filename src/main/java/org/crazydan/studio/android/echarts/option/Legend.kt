@@ -42,7 +42,7 @@ class Legend : JSONable {
 
 @EChartsOption
 class LegendType(
-    val holder: LegendHolder,
+    private val holder: LegendHolder,
 ) {
 
     /** 普通类型：平铺展开图例 */
