@@ -2,21 +2,19 @@ package org.crazydan.studio.android.echarts.option
 
 import androidx.compose.ui.graphics.Color
 import org.crazydan.studio.android.echarts.EChartsOption
-import org.crazydan.studio.android.echarts.EChartsOptions
+import org.crazydan.studio.android.echarts.ThemeHolder
 
 /**
+ * 主题相关配置
  *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-08
  */
-fun EChartsOptions.theme(
-    backgroundColor: Color? = null,
-): EChartsOptions = this.add(
-    Theme(
-        backgroundColor = backgroundColor,
-    )
-)
+@EChartsOption
+class Theme(
+    private val holder: ThemeHolder
+) {
 
-private data class Theme(
-    val backgroundColor: Color?,
-) : EChartsOption
+    /** 背景色，默认无背景 */
+    fun backgroundColor(value: Color) = holder.backgroundColor(value)
+}

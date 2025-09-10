@@ -1,72 +1,187 @@
 package org.crazydan.studio.android.echarts.option
 
 import org.crazydan.studio.android.echarts.EChartsOption
-import org.crazydan.studio.android.echarts.EChartsOptions
 import org.crazydan.studio.android.echarts.JSONable
 
+@EChartsOption
+open class DataZoomList(
+    private val holder: MutableList<DataZoom>,
+) {
+
+    /** [内置型数据区域缩放](https://echarts.apache.org/zh/option.html#dataZoom-inside) */
+    fun inside(block: DataZoomInside.() -> Unit) {
+        val zoom = DataZoomInside().apply(block)
+        holder.add(zoom)
+    }
+
+    /** [滑动条型数据区域缩放](https://echarts.apache.org/zh/option.html#dataZoom-slider) */
+    fun slider(block: DataZoomSlider.() -> Unit) {
+        val zoom = DataZoomSlider().apply(block)
+        holder.add(zoom)
+    }
+}
+
 /**
- * 可多次调用以组装 [dataZoom] 数组：https://echarts.apache.org/en/option.html#dataZoom
+ * 内置型数据区域缩放
+ *
+ * 所谓『内置』，即内置在坐标系中
+ * - 平移：在坐标系中滑动拖拽进行数据区域平移
+ * - 缩放：
+ * - - PC端：鼠标在坐标系范围内滚轮滚动（MAC触控板类同）
+ * - - 移动端：在移动端触屏上，支持两指滑动缩放
+ *
+ * [说明文档](https://echarts.apache.org/zh/option.html#dataZoom-inside)
  *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-06
  */
-fun EChartsOptions.dataZoom(
-    show: Boolean = true,
-    type: DataZoomType,
-    filterMode: DataZoomFilterMode? = DataZoomFilterMode.Filter,
-    startValueIndex: Int? = null,
-    endValueIndex: Int? = null,
-
-    /** 对应的 x 轴的序号：单个图表可以有上下两条 x 轴 */
-    xAxisIndex: List<Int>? = null,
-    /** 对应的 y 轴的序号：单个图表可以有左右两条 y 轴 */
-    yAxisIndex: List<Int>? = null,
-
-    left: Size? = null,
-    right: Size? = null,
-    top: Size? = null,
-    bottom: Size? = null,
-): EChartsOptions = this.multiAdd(
-    DataZoomOption(
-        dataZoom = DataZoom(
-            show = show,
-            type = type,
-            startValue = startValueIndex,
-            endValue = endValueIndex,
-            filterMode = filterMode,
-            xAxisIndex = xAxisIndex,
-            yAxisIndex = yAxisIndex,
-            left = left,
-            right = right,
-            top = top,
-            bottom = bottom,
-        ),
+@EChartsOption
+class DataZoomInside(
+    private val holder: DataZoomHolder = DataZoomHolder(
+        type = Type.Inside, disabled = false,
     )
-)
+) : DataZoom(holder) {
 
-private data class DataZoomOption(
-    val dataZoom: DataZoom,
-) : EChartsOption
-
-private data class DataZoom(
-    val show: Boolean,
-    val type: DataZoomType,
-    val startValue: Int?,
-    val endValue: Int?,
-    val filterMode: DataZoomFilterMode?,
-    val xAxisIndex: List<Int>?,
-    val yAxisIndex: List<Int>?,
-    val left: Size?,
-    val right: Size?,
-    val top: Size?,
-    val bottom: Size?,
-) : JSONable
-
-enum class DataZoomType {
-    Inside, Slider
+    /** 是否禁用 */
+    fun disabled(value: Boolean) {
+        holder.disabled = value
+    }
 }
 
-/** https://echarts.apache.org/en/option.html#dataZoom-slider.filterMode */
-enum class DataZoomFilterMode {
-    Filter, WeakFilter, Empty, None
+/**
+ * 滑动条型数据区域缩放
+ *
+ * 提供数据缩略图显示、缩放、刷选、拖拽、点击快速定位等数据筛选的功能
+ *
+ * [说明文档](https://echarts.apache.org/en/option.html#dataZoom-slider)
+ *
+ * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
+ * @date 2025-09-06
+ */
+@EChartsOption
+class DataZoomSlider(
+    private val holder: DataZoomHolder = DataZoomHolder(
+        type = Type.Slider, show = true,
+    )
+) : DataZoom(holder) {
+
+    /** 是否显示 */
+    fun show(value: Boolean) {
+        holder.show = value
+    }
+
+    /** 与容器周边的间隔 */
+    fun margin(block: Margin.() -> Unit) {
+        Margin(holder).apply(block)
+    }
+}
+
+@EChartsOption
+open class DataZoom(
+    private val holder: DataZoomHolder,
+) : JSONable {
+
+    enum class Type {
+        Inside, Slider
+    }
+
+    enum class FilterMode {
+        Filter, WeakFilter, Empty, None
+    }
+
+    override fun toJSON(): String = holder.toJSON()
+
+    /** [数据过滤模式](https://echarts.apache.org/zh/option.html#dataZoom-inside.filterMode) */
+    fun filterMode(block: DataZoomFilterMode.() -> Unit) {
+        DataZoomFilterMode(holder).apply(block)
+    }
+
+    /** 数据窗口范围 */
+    fun window(block: DataZoomWindow.() -> Unit) {
+        DataZoomWindow(holder).apply(block)
+    }
+}
+
+data class DataZoomHolder(
+    var type: DataZoom.Type,
+
+    // common
+    var filterMode: DataZoom.FilterMode? = DataZoom.FilterMode.Filter,
+
+    var start: Float? = null,
+    var end: Float? = null,
+    var startValue: Int? = null,
+    var endValue: Int? = null,
+
+    var xAxisIndex: List<Int>? = null,
+    var yAxisIndex: List<Int>? = null,
+
+    // for inside
+    var disabled: Boolean? = null,
+
+    // for slider
+    var show: Boolean? = null,
+) : MarginHolder()
+
+@EChartsOption
+class DataZoomFilterMode(
+    private val holder: DataZoomHolder,
+) {
+
+    /**
+     * 当前数据窗口外的数据，将被过滤掉。其会影响其他轴的数据范围，
+     * 每个数据项，只要有一个维度在数据窗口外，整个数据项就会被过滤掉
+     */
+    fun filter() {
+        holder.filterMode = DataZoom.FilterMode.Filter
+    }
+
+    /**
+     * 当前数据窗口外的数据，将被过滤掉。其会影响其他轴的数据范围，
+     * 每个数据项，只有当全部维度都在数据窗口同侧外部，整个数据项才会被过滤掉
+     */
+    fun weakFilter() {
+        holder.filterMode = DataZoom.FilterMode.WeakFilter
+    }
+
+    /** 当前数据窗口外的数据，将被设置为空。其不会影响其他轴的数据范围 */
+    fun empty() {
+        holder.filterMode = DataZoom.FilterMode.Empty
+    }
+
+    /** 不过滤数据，只改变数轴范围 */
+    fun none() {
+        holder.filterMode = DataZoom.FilterMode.None
+    }
+}
+
+@EChartsOption
+class DataZoomWindow(
+    private val holder: DataZoomHolder,
+) {
+
+    sealed class Size {
+        class Percent(val value: Float) : Size()
+        class Index(val value: Int) : Size()
+    }
+
+    /** 数轴序号 */
+    inline val Int.idx: Size.Index
+        get() = Size.Index(this)
+
+    /** 数轴区间的百分比 */
+    inline val Float.pct: Size.Percent
+        get() = Size.Percent(this)
+
+    /** 数据窗口范围：起始与结束值为数轴序号 */
+    fun range(start: Size.Index, end: Size.Index) {
+        holder.startValue = start.value
+        holder.endValue = end.value
+    }
+
+    /** 数据窗口范围：起始与结束值为数轴区间的百分比 */
+    fun range(start: Size.Percent, end: Size.Percent) {
+        holder.start = start.value
+        holder.end = end.value
+    }
 }

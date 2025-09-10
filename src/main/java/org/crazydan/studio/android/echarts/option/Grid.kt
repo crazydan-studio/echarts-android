@@ -40,18 +40,22 @@ class Grid(
 
     /** [x 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
     fun xAxis(id: String? = null, block: GridXAxis.() -> Unit) {
-        axisHolder.xAxis = GridXAxis(
-            id = id,
-            gridId = holder.id
-        ).apply(block)
+        axisHolder.addXAxis(
+            GridXAxis(
+                id = id,
+                gridId = holder.id
+            ).apply(block)
+        )
     }
 
     /** [y 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
     fun yAxis(id: String? = null, block: GridYAxis.() -> Unit) {
-        axisHolder.yAxis = GridYAxis(
-            id = id,
-            gridId = holder.id
-        ).apply(block)
+        axisHolder.addYAxis(
+            GridYAxis(
+                id = id,
+                gridId = holder.id
+            ).apply(block)
+        )
     }
 }
 

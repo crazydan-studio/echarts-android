@@ -1,7 +1,6 @@
 package org.crazydan.studio.android.echarts
 
-import org.crazydan.studio.android.echarts.option.percent
-import org.crazydan.studio.android.echarts.option.pixel
+import androidx.compose.ui.graphics.Color
 import org.junit.Assert
 import org.junit.Test
 
@@ -15,6 +14,9 @@ class EChartsOptionTest {
     @Test
     fun test_toJSON() {
         val option = ECharts.option {
+            theme {
+                backgroundColor(Color(0xFF141218))
+            }
             tooltip {
                 triggerBy { axis() }
                 axisPointer {
@@ -24,19 +26,43 @@ class EChartsOptionTest {
             legend {
                 type { plain() }
                 margin {
-                    top(20.pixel)
+                    top(20.px)
+                }
+            }
+            dataZoom {
+                inside {
+                    disabled(true)
+                }
+                slider {
+                    show(false)
+                }
+
+                inside {
+                    filterMode { weakFilter() }
+                    window {
+                        range(0.idx, 10.idx)
+                    }
+                }
+                slider {
+                    filterMode { filter() }
+                    margin {
+                        top(90f.pct)
+                        right(10f.pct)
+                    }
+                    window {
+                        range(50f.pct, 100f.pct)
+                    }
                 }
             }
             grid(id = "grid:0") {
                 showBorder(false)
                 margin {
-                    left(10f.percent)
-                    right(10f.percent)
-                    bottom(15f.percent)
+                    horizontal(10f.pct)
+                    bottom(15f.pct)
                 }
 
                 xAxis(id = "grid:0:x:0") {
-                    position { bottom(5) }
+                    position { bottom(5.px) }
                     axisTick { alignWithLabel(true) }
 
                     type {
@@ -57,12 +83,7 @@ class EChartsOptionTest {
             }
         }
 
-        val options = EChartsOptions.dataZoom(
-            type = DataZoomType.Slider,
-            top = Size.percent(90f),
-            startValueIndex = 0,
-            endValueIndex = 1,
-        ).series(
+        val options = EChartsOptions.series(
             listOf(
                 Series.Line(
                     name = "Abc",

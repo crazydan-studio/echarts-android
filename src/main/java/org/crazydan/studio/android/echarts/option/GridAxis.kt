@@ -109,7 +109,7 @@ open class GridAxisHolder(
     var scale: Boolean = false,
 
     var position: GridAxis.Position? = null,
-    var offset: Number? = null,
+    var offset: Size? = null,
 
     var data: List<GridAxis.Data>? = null,
 
@@ -173,14 +173,14 @@ class GridAxisTypeValue(
 @EChartsOption
 class GridXAxisPosition(
     private val holder: GridAxisHolder,
-) {
+) : SizeScope() {
 
     /**
      * 将 x 轴放置于 [Grid] 的顶部
      *
      * @param offset 偏移量，避免多个顶部的 x 轴重叠
      */
-    fun top(offset: Number? = null) {
+    fun top(offset: Size? = null) {
         updateAxisPosition(holder, GridAxis.Position.Top, offset)
     }
 
@@ -189,7 +189,7 @@ class GridXAxisPosition(
      *
      * @param offset 偏移量，避免多个底部的 x 轴重叠
      */
-    fun bottom(offset: Number? = null) {
+    fun bottom(offset: Size? = null) {
         updateAxisPosition(holder, GridAxis.Position.Bottom, offset)
     }
 }
@@ -197,14 +197,14 @@ class GridXAxisPosition(
 @EChartsOption
 class GridYAxisPosition(
     private val holder: GridAxisHolder,
-) {
+): SizeScope() {
 
     /**
      * 将 y 轴放置于 [Grid] 的左侧
      *
      * @param offset 偏移量，避免多个左侧的 y 轴重叠
      */
-    fun left(offset: Number? = null) {
+    fun left(offset: Size? = null) {
         updateAxisPosition(holder, GridAxis.Position.Left, offset)
     }
 
@@ -213,7 +213,7 @@ class GridYAxisPosition(
      *
      * @param offset 偏移量，避免多个右侧的 y 轴重叠
      */
-    fun right(offset: Number? = null) {
+    fun right(offset: Size? = null) {
         updateAxisPosition(holder, GridAxis.Position.Right, offset)
     }
 }
@@ -221,7 +221,7 @@ class GridYAxisPosition(
 private fun updateAxisPosition(
     holder: GridAxisHolder,
     position: GridAxis.Position,
-    offset: Number?,
+    offset: Size?,
 ) {
     holder.position = position
     holder.offset = offset
