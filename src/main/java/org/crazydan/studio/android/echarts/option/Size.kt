@@ -62,14 +62,14 @@ interface Size : JSONable {
     }
 }
 
-open class SizeScope {
+interface SizeScope {
 
     /** 像素值 */
-    inline val Int.px: Size.Pixel
+    val Int.px: Size.Pixel
         get() = Size.Pixel(this)
 
     /** 百分比 */
-    inline val Float.pct: Size.Percent
+    val Float.pct: Size.Percent
         get() = Size.Percent(this)
 }
 

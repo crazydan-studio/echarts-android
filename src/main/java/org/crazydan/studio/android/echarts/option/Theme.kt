@@ -1,6 +1,5 @@
 package org.crazydan.studio.android.echarts.option
 
-import androidx.compose.ui.graphics.Color
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.ThemeHolder
 
@@ -13,8 +12,11 @@ import org.crazydan.studio.android.echarts.ThemeHolder
 @EChartsOption
 class Theme(
     private val holder: ThemeHolder
-) {
+) : ColorScope {
 
     /** 背景色，默认无背景 */
     fun backgroundColor(value: Color) = holder.backgroundColor(value)
+
+    /** [Series] 颜色列表。如果 [Series] 没有设置颜色，则会依次循环从该列表中取颜色作为系列颜色 */
+    fun seriesColors(value: List<Color>) = holder.seriesColors(value)
 }

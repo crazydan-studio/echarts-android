@@ -1,6 +1,5 @@
 package org.crazydan.studio.android.echarts
 
-import androidx.compose.ui.graphics.Color
 import org.junit.Assert
 import org.junit.Test
 
@@ -15,7 +14,20 @@ class EChartsOptionTest {
     fun test_toJSON() {
         val option = ECharts.option {
             theme {
-                backgroundColor(Color(0xFF141218))
+                backgroundColor(rgba(0x141218))
+                seriesColors(
+                    listOf(
+                        rgba(0x5470c6),
+                        rgba(0x91cc75),
+                        rgba(0xfac858),
+                        rgba(0xee6666),
+                        rgba(0x73c0de),
+                        rgba(0x3ba272),
+                        rgba(0xfc8452),
+                        rgba(0x9a60b4),
+                        rgba(0xea7ccc),
+                    )
+                )
             }
             tooltip {
                 triggerBy { axis() }

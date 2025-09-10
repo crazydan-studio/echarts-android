@@ -1,7 +1,5 @@
 package org.crazydan.studio.android.echarts
 
-import androidx.compose.ui.graphics.Color
-import kotlin.math.roundToInt
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -74,10 +72,6 @@ private fun jsonValue(value: Any?): String {
             value.toString()
         }
 
-        is Color -> {
-            "\"${toRgba(value)}\""
-        }
-
         is Enum<*> -> {
             enumToJSON(value)
         }
@@ -102,13 +96,4 @@ private fun jsonValue(value: Any?): String {
             "\"$str\""
         }
     }
-}
-
-fun toRgba(color: Color): String {
-    val r = (color.red * 255).roundToInt()
-    val g = (color.green * 255).roundToInt()
-    val b = (color.blue * 255).roundToInt()
-    val a = color.alpha
-
-    return "rgba($r, $g, $b, $a)"
 }

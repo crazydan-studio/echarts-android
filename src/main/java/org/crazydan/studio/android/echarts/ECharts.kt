@@ -1,6 +1,6 @@
 package org.crazydan.studio.android.echarts
 
-import androidx.compose.ui.graphics.Color
+import org.crazydan.studio.android.echarts.option.Color
 import org.crazydan.studio.android.echarts.option.DataZoom
 import org.crazydan.studio.android.echarts.option.DataZoomList
 import org.crazydan.studio.android.echarts.option.Grid
@@ -67,6 +67,7 @@ interface ECharts {
 }
 
 class OptionHolder(
+    var color: List<Color>? = null,
     var backgroundColor: Color? = null,
 
     var tooltip: Tooltip? = null,
@@ -85,6 +86,10 @@ class OptionHolder(
         backgroundColor = value
     }
 
+    override fun seriesColors(value: List<Color>) {
+        color = value
+    }
+
     override fun addXAxis(value: GridXAxis) {
         xAxis.add(value)
     }
@@ -96,6 +101,7 @@ class OptionHolder(
 
 interface ThemeHolder {
     fun backgroundColor(value: Color)
+    fun seriesColors(value: List<Color>)
 }
 
 interface GridAxisHolder {
