@@ -3,10 +3,12 @@ package org.crazydan.studio.android.echarts
 import org.crazydan.studio.android.echarts.option.Color
 import org.crazydan.studio.android.echarts.option.DataZoom
 import org.crazydan.studio.android.echarts.option.DataZoomList
-import org.crazydan.studio.android.echarts.option.Grid
-import org.crazydan.studio.android.echarts.option.GridXAxis
-import org.crazydan.studio.android.echarts.option.GridYAxis
+import org.crazydan.studio.android.echarts.option.coord.Grid
+import org.crazydan.studio.android.echarts.option.coord.GridXAxis
+import org.crazydan.studio.android.echarts.option.coord.GridYAxis
 import org.crazydan.studio.android.echarts.option.Legend
+import org.crazydan.studio.android.echarts.option.Series
+import org.crazydan.studio.android.echarts.option.SeriesList
 import org.crazydan.studio.android.echarts.option.Theme
 import org.crazydan.studio.android.echarts.option.Tooltip
 
@@ -54,6 +56,11 @@ interface ECharts {
             holder.dataZoom = list.toList()
         }
 
+        /** 系列配置 */
+        fun series(block: SeriesList.() -> Unit) {
+            SeriesList(holder).apply(block)
+        }
+
         /** [Grid 配置](https://echarts.apache.org/en/option.html#grid) */
         fun grid(id: String? = null, block: Grid.() -> Unit) {
             if (holder.grid.isNotEmpty() && id.isNullOrBlank()) {
@@ -73,6 +80,7 @@ class OptionHolder(
     var tooltip: Tooltip? = null,
     var legend: Legend? = null,
     var dataZoom: List<DataZoom>? = null,
+    val series: MutableList<Series> = mutableListOf(),
 
     // Grid 坐标系
     val grid: MutableList<Grid> = mutableListOf(),
@@ -80,7 +88,7 @@ class OptionHolder(
     val yAxis: MutableList<GridYAxis> = mutableListOf(),
 
     // 其他坐标系 ...
-) : JSONable, ThemeHolder, GridAxisHolder {
+) : JSONable, ThemeHolder, GridAxisHolder, SeriesListHolder {
 
     override fun backgroundColor(value: Color) {
         backgroundColor = value
@@ -97,6 +105,10 @@ class OptionHolder(
     override fun addYAxis(value: GridYAxis) {
         yAxis.add(value)
     }
+
+    override fun addSeries(value: Series) {
+        series.add(value)
+    }
 }
 
 interface ThemeHolder {
@@ -107,4 +119,8 @@ interface ThemeHolder {
 interface GridAxisHolder {
     fun addXAxis(value: GridXAxis)
     fun addYAxis(value: GridYAxis)
+}
+
+interface SeriesListHolder {
+    fun addSeries(value: Series)
 }

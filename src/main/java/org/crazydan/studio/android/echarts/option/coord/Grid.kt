@@ -1,8 +1,10 @@
-package org.crazydan.studio.android.echarts.option
+package org.crazydan.studio.android.echarts.option.coord
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.GridAxisHolder
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.Margin
+import org.crazydan.studio.android.echarts.option.MarginHolder
 
 /**
  * 直角坐标系 Grid

@@ -1,7 +1,9 @@
-package org.crazydan.studio.android.echarts.option
+package org.crazydan.studio.android.echarts.option.coord
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.Size
+import org.crazydan.studio.android.echarts.option.SizeScope
 
 /**
  * 直角坐标系 [Grid] 中的 x 轴
@@ -11,7 +13,7 @@ import org.crazydan.studio.android.echarts.JSONable
  *
  * [说明文档](https://echarts.apache.org/en/option.html#xAxis)
  *
- * @param id 坐标轴唯一标识，在有多个 x 轴时，[Series] 可通过该标识指定数据所属的数轴
+ * @param id 坐标轴唯一标识，在有多个 x 轴时，[org.crazydan.studio.android.echarts.option.Series] 可通过该标识指定数据所属的数轴
  * @param gridId 指定坐标轴所属的 [Grid]
  *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
@@ -42,7 +44,7 @@ class GridXAxis(
  *
  * [说明文档](https://echarts.apache.org/en/option.html#yAxis)
  *
- * @param id 坐标轴唯一标识，在有多个 y 轴时，[Series] 可通过该标识指定数据所属的数轴
+ * @param id 坐标轴唯一标识，在有多个 y 轴时，[org.crazydan.studio.android.echarts.option.Series] 可通过该标识指定数据所属的数轴
  * @param gridId 指定坐标轴所属的 [Grid]
  *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
@@ -77,10 +79,6 @@ open class GridAxis(
         Top, Bottom, Left, Right
     }
 
-    data class Data(
-        val value: String,
-    ) : JSONable
-
     override fun toJSON(): String = holder.toJSON()
 
     /** 是否显示 */
@@ -111,7 +109,7 @@ open class GridAxisHolder(
     var position: GridAxis.Position? = null,
     var offset: Size? = null,
 
-    var data: List<GridAxis.Data>? = null,
+    var data: List<GridAxisData>? = null,
 
     var axisTick: GridAxisTick? = null,
 ) : JSONable
@@ -173,7 +171,7 @@ class GridAxisTypeValue(
 @EChartsOption
 class GridXAxisPosition(
     private val holder: GridAxisHolder,
-) : SizeScope() {
+) : SizeScope {
 
     /**
      * 将 x 轴放置于 [Grid] 的顶部
@@ -197,7 +195,7 @@ class GridXAxisPosition(
 @EChartsOption
 class GridYAxisPosition(
     private val holder: GridAxisHolder,
-): SizeScope() {
+) : SizeScope {
 
     /**
      * 将 y 轴放置于 [Grid] 的左侧
@@ -255,28 +253,28 @@ class GridAxisDataListByType(
 ) {
 
     /** 坐标轴标签列表 */
-    fun data(block: GridAxisDataList.() -> List<GridAxis.Data>) {
-        holder.data = block.invoke(GridAxisDataList())
+    fun data(block: GridAxisDataList.() -> Unit) {
+        val items = mutableListOf<GridAxisData>()
+        GridAxisDataList(items).apply(block)
+
+        holder.data = items.toList()
     }
 }
 
 @EChartsOption
-class GridAxisDataList() {
+class GridAxisDataList(
+    private val items: MutableList<GridAxisData>
+) {
 
     /**
      * 坐标轴标签项
      *
      * @param value 标签名
      */
-    fun item(value: String, block: (GridAxisData.() -> Unit)? = null): GridAxis.Data {
-        val holder = GridAxisDataHolder(value = value)
-
-        block?.let {
-            GridAxisData(holder).apply(it)
-        }
-
-        return GridAxis.Data(
-            value = holder.value,
+    fun item(value: String, block: GridAxisData.() -> Unit) {
+        val data = GridAxisDataHolder(value = value)
+        items.add(
+            GridAxisData(data).apply(block)
         )
     }
 }
@@ -284,7 +282,8 @@ class GridAxisDataList() {
 @EChartsOption
 class GridAxisData(
     private val holder: GridAxisDataHolder,
-) {
+) : JSONable {
+    override fun toJSON(): String = holder.toJSON()
 
     // fun textStyle(...) {}
 }
@@ -292,4 +291,4 @@ class GridAxisData(
 data class GridAxisDataHolder(
     var value: String,
     var textStyle: Any? = null,
-)
+) : JSONable

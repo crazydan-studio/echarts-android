@@ -12,7 +12,7 @@ import org.crazydan.studio.android.echarts.JSONable
 @EChartsOption
 class Margin(
     private val holder: MarginHolder,
-) : SizeScope() {
+) : SizeScope {
 
     /** 左侧的间距 */
     fun left(value: Size) {
