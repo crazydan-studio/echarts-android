@@ -202,13 +202,18 @@ data class SeriesDataDimensionHolder(
     var tooltip: Map<String, String>? = null,
 )
 
+@EChartsOption
+class SeriesMarkLine(
+
+) {}
+
 data class SeriesLabel(
     val show: Boolean = true,
     /** https://echarts.apache.org/en/option.html#series-line.markArea.label */
     val formatter: String? = null,
 ) : JSONable
 
-data class SeriesMarkLine(
+data class SeriesMarkLineHolder(
     val silent: Boolean = true,
     val label: SeriesLabel? = null,
     val data: List<Range>,
@@ -229,7 +234,7 @@ data class SeriesMarkLine(
     }
 }
 
-data class SeriesMarkArea(
+data class SeriesMarkAreaHolder(
     val silent: Boolean = true,
     val label: SeriesLabel? = null,
     val data: List<Range>,
@@ -246,7 +251,7 @@ data class SeriesMarkArea(
     }
 }
 
-data class SeriesMarkPoint(
+data class SeriesMarkPointHolder(
     val silent: Boolean = true,
     val label: SeriesLabel? = null,
     val data: List<SeriesMarkData>,

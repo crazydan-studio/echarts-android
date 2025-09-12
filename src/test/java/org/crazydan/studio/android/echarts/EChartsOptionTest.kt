@@ -66,7 +66,10 @@ class EChartsOptionTest {
                     }
                 }
             }
-            grid(id = "grid:0") {
+        }
+
+        option.also {
+            it.grid(id = "grid:0") {
                 showBorder(false)
                 margin {
                     horizontal(10f.pct)
@@ -82,6 +85,7 @@ class EChartsOptionTest {
                             data {
                                 item("2021-10-11") {}
                                 item("2021-10-12") {}
+                                item("2021-10-13") {}
                             }
                         }
                     }
@@ -89,11 +93,30 @@ class EChartsOptionTest {
                 yAxis(id = "grid:0:y:0") {
                     position { left() }
 
+                    name("血糖 (mmol/L)") { position { center() } }
                     type { value { fromZero(true) } }
+                    maxValue(20f)
+
+                    markLine {
+                        value(3.9f)
+                        name("<血糖>下限 (3.9 mmol/L)")
+                        label {
+                            formatter("{b}")
+                            position { insideStartTop() }
+                        }
+                    }
+                    markLine {
+                        value(15f)
+                        name("<血糖>上限 (15 mmol/L)")
+                        label {
+                            formatter("{b}")
+                            position { insideStartBottom() }
+                        }
+                    }
                 }
             }
 
-            series {
+            it.series {
                 line {
                     name("S1")
                     colorBy { data() }
@@ -114,6 +137,36 @@ class EChartsOptionTest {
                         item(0, 10) {}
                         item(1, null) {}
                     }
+
+                    markArea {
+                        byPoint {
+                            name("数据区间")
+
+                            start {
+                                byDataDimension { max("highest") }
+                            }
+                            end {
+                                byDataDimension { min("lowest") }
+                            }
+                        }
+
+                        byPoint {
+                            name("观察窗口")
+
+                            start {
+                                byCoordinate(x = 1, y = 3f)
+                            }
+                            end {
+                                byCoordinate(x = 4, y = 10f)
+                            }
+                        }
+                    }
+                    markArea {
+                        byYAxis {
+                            value(6.1f, 7.8f)
+                            name("空腹 8h (6.1 ~ 7.8 mmol/L)")
+                        }
+                    }
                 }
 
                 candlestick {
@@ -128,6 +181,73 @@ class EChartsOptionTest {
 
                         item(0, 10, 11, 10, 13) {}
                         item(1, 8, 6, 10, 21) {}
+                    }
+
+                    markLine {
+                        byPoint {
+                            name("最大差异")
+                            symbol { circle(10) }
+                            label {
+                                position { middle() }
+                                formatter("{b}")
+                            }
+
+                            start {
+                                byDataDimension { max("highest") }
+                            }
+                            end {
+                                byDataDimension { min("lowest") }
+                                symbol { rotate(0) }
+                            }
+                        }
+                        byPoint {
+                            symbol {
+                                pin(30)
+                                rotate(180)
+                            }
+
+                            start {
+                                byCoordinate(x = 1, y = 3.1f)
+                            }
+                            end {
+                                byCoordinate(x = 4, y = 9.1f)
+                            }
+                        }
+                    }
+                    markLine {
+                        byXAxis {
+                            value("2021-10-12")
+                            name("就医后")
+                            label {
+                                position { insideStartTop() }
+                                formatter("{b}")
+                            }
+                        }
+
+                        byYAxis {
+                            value((10f))
+                            name("<餐后 2h>上限 (10 mmol/L)")
+                            label {
+                                position { insideStartBottom() }
+                                formatter("{b}")
+                            }
+                        }
+                    }
+
+                    markPoint {
+                        symbol { pin(50) }
+                        byDataDimension { max("highest") }
+                    }
+                    markPoint {
+                        symbol { pin(50) }
+                        byDataDimension { min("lowest") }
+                    }
+                    markPoint {
+                        name("Start")
+                        label { formatter("{b}") }
+
+                        symbol { circle(50) }
+                        byCoordinate(x = 1, y = 10f)
                     }
                 }
             }

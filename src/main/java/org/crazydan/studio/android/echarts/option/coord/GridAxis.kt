@@ -86,9 +86,25 @@ open class GridAxis(
         holder.show = value
     }
 
+    /** 坐标轴名称 */
+    fun name(value: String, block: GridAxisName.() -> Unit) {
+        holder.name = value
+        GridAxisName(holder).apply(block)
+    }
+
     /** 坐标轴类型 */
     fun type(block: GridAxisType.() -> Unit) {
         GridAxisType(holder).apply(block)
+    }
+
+    /** 坐标轴刻度最小值 */
+    fun minValue(value: Number) {
+        holder.min = value
+    }
+
+    /** 坐标轴刻度最大值 */
+    fun maxValue(value: Number) {
+        holder.max = value
     }
 
     /** [坐标轴刻度配置](https://echarts.apache.org/zh/option.html#xAxis.axisTick) */
@@ -103,8 +119,13 @@ open class GridAxisHolder(
     val gridId: String?,
     var show: Boolean = true,
 
+    var name: String? = null,
+    var nameLocation: GridAxisName.Position? = null,
+
     var type: GridAxis.Type = GridAxis.Type.Category,
     var scale: Boolean = false,
+    var min: Number? = null,
+    var max: Number? = null,
 
     var position: GridAxis.Position? = null,
     var offset: Size? = null,
@@ -113,6 +134,39 @@ open class GridAxisHolder(
 
     var axisTick: GridAxisTick? = null,
 ) : JSONable
+
+@EChartsOption
+class GridAxisName(
+    private val holder: GridAxisHolder
+) {
+
+    enum class Position {
+        Start, Center, End
+    }
+
+    /** 显示位置 */
+    fun position(block: GridAxisNamePosition.() -> Unit) {
+        GridAxisNamePosition(holder).apply(block)
+    }
+}
+
+@EChartsOption
+class GridAxisNamePosition(
+    private val holder: GridAxisHolder
+) {
+
+    fun start() {
+        holder.nameLocation = GridAxisName.Position.Start
+    }
+
+    fun center() {
+        holder.nameLocation = GridAxisName.Position.Center
+    }
+
+    fun end() {
+        holder.nameLocation = GridAxisName.Position.End
+    }
+}
 
 @EChartsOption
 class GridAxisType(

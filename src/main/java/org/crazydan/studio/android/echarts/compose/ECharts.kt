@@ -23,7 +23,7 @@ import org.crazydan.studio.android.echarts.ECharts
  */
 @Composable
 fun ECharts(
-    options: ECharts.Option,
+    option: ECharts.Option,
     modifier: Modifier = Modifier,
     useDarkTheme: Boolean = false,
 ) {
@@ -46,7 +46,7 @@ fun ECharts(
         // Note: 视图重组时会调用该接口
         update = { view ->
             if (isChartReady) {
-                view.updateChartOptions(options)
+                view.updateChartOptions(option)
             }
         },
     )
