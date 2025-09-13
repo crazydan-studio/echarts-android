@@ -9,8 +9,9 @@ import org.crazydan.studio.android.echarts.JSONable
  * @date 2025-09-09
  */
 @EChartsOption
-class Label : JSONable {
-    private val holder = LabelHolder()
+open class Label(
+    private val holder: LabelHolder = LabelHolder(),
+) : JSONable {
 
     override fun toJSON(): String = holder.toJSON()
 
@@ -25,7 +26,7 @@ class Label : JSONable {
     }
 }
 
-private data class LabelHolder(
+open class LabelHolder(
     var show: Boolean = true,
     var formatter: String? = null,
 ) : JSONable

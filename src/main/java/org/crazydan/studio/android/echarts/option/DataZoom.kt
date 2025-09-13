@@ -2,6 +2,7 @@ package org.crazydan.studio.android.echarts.option
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.DataZoom.FilterMode
 
 @EChartsOption
 open class DataZoomList(
@@ -72,7 +73,7 @@ class DataZoomSlider(
 
     /** 与容器周边的间隔 */
     fun margin(block: Margin.() -> Unit) {
-        Margin(holder).apply(block)
+        Margin(holder).block()
     }
 }
 
@@ -92,13 +93,13 @@ open class DataZoom(
     override fun toJSON(): String = holder.toJSON()
 
     /** [数据过滤模式](https://echarts.apache.org/zh/option.html#dataZoom-inside.filterMode) */
-    fun filterMode(block: DataZoomFilterMode.() -> Unit) {
-        DataZoomFilterMode(holder).apply(block)
+    fun filterMode(block: DataZoomFilterModeScope.() -> FilterMode) {
+        holder.filterMode = DataZoomFilterModeScope().block()
     }
 
     /** 数据窗口范围 */
     fun window(block: DataZoomWindow.() -> Unit) {
-        DataZoomWindow(holder).apply(block)
+        DataZoomWindow(holder).block()
     }
 }
 
@@ -106,7 +107,7 @@ data class DataZoomHolder(
     var type: DataZoom.Type,
 
     // common
-    var filterMode: DataZoom.FilterMode? = DataZoom.FilterMode.Filter,
+    var filterMode: FilterMode? = FilterMode.Filter,
 
     var start: Float? = null,
     var end: Float? = null,
@@ -122,38 +123,6 @@ data class DataZoomHolder(
     // for slider
     var show: Boolean? = null,
 ) : MarginHolder()
-
-@EChartsOption
-class DataZoomFilterMode(
-    private val holder: DataZoomHolder,
-) {
-
-    /**
-     * 当前数据窗口外的数据，将被过滤掉。其会影响其他轴的数据范围，
-     * 每个数据项，只要有一个维度在数据窗口外，整个数据项就会被过滤掉
-     */
-    fun filter() {
-        holder.filterMode = DataZoom.FilterMode.Filter
-    }
-
-    /**
-     * 当前数据窗口外的数据，将被过滤掉。其会影响其他轴的数据范围，
-     * 每个数据项，只有当全部维度都在数据窗口同侧外部，整个数据项才会被过滤掉
-     */
-    fun weakFilter() {
-        holder.filterMode = DataZoom.FilterMode.WeakFilter
-    }
-
-    /** 当前数据窗口外的数据，将被设置为空。其不会影响其他轴的数据范围 */
-    fun empty() {
-        holder.filterMode = DataZoom.FilterMode.Empty
-    }
-
-    /** 不过滤数据，只改变数轴范围 */
-    fun none() {
-        holder.filterMode = DataZoom.FilterMode.None
-    }
-}
 
 @EChartsOption
 class DataZoomWindow(
@@ -184,4 +153,24 @@ class DataZoomWindow(
         holder.start = start.value
         holder.end = end.value
     }
+}
+
+class DataZoomFilterModeScope {
+    /**
+     * 当前数据窗口外的数据，将被过滤掉。其会影响其他轴的数据范围，
+     * 每个数据项，只要有一个维度在数据窗口外，整个数据项就会被过滤掉
+     */
+    val filter = FilterMode.Filter
+
+    /**
+     * 当前数据窗口外的数据，将被过滤掉。其会影响其他轴的数据范围，
+     * 每个数据项，只有当全部维度都在数据窗口同侧外部，整个数据项才会被过滤掉
+     */
+    val weakFilter = FilterMode.WeakFilter
+
+    /** 当前数据窗口外的数据，将被设置为空。其不会影响其他轴的数据范围 */
+    val empty = FilterMode.Empty
+
+    /** 不过滤数据，只改变数轴范围 */
+    val none = FilterMode.None
 }

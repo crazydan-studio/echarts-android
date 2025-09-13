@@ -2,6 +2,7 @@ package org.crazydan.studio.android.echarts.option
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.Legend.Type
 
 /**
  * [说明文档](https://echarts.apache.org/en/option.html#legend)
@@ -25,8 +26,8 @@ class Legend : JSONable {
     }
 
     /** 图例类型 */
-    fun type(block: LegendType.() -> Unit) {
-        LegendType(holder).apply(block)
+    fun type(block: LegendTypeScope.() -> Type) {
+        holder.type = LegendTypeScope().block()
     }
 
     /** 文本格式化器 */
@@ -36,29 +37,22 @@ class Legend : JSONable {
 
     /** 与容器周边的间隔 */
     fun margin(block: Margin.() -> Unit) {
-        Margin(holder).apply(block)
-    }
-}
-
-@EChartsOption
-class LegendType(
-    private val holder: LegendHolder,
-) {
-
-    /** 普通类型：平铺展开图例 */
-    fun plain() {
-        holder.type = Legend.Type.Plain
-    }
-
-    /** 滚动翻页类型。当图例数量较多时可以使用 */
-    fun scroll() {
-        holder.type = Legend.Type.Scroll
+        Margin(holder).block()
     }
 }
 
 data class LegendHolder(
     var show: Boolean = true,
-    var type: Legend.Type = Legend.Type.Plain,
+    var type: Type = Type.Plain,
 
     var formatter: String? = null,
 ) : MarginHolder()
+
+class LegendTypeScope() {
+
+    /** 普通类型：平铺展开图例 */
+    val plain = Type.Plain
+
+    /** 滚动翻页类型。当图例数量较多时可以使用 */
+    val scroll = Type.Scroll
+}

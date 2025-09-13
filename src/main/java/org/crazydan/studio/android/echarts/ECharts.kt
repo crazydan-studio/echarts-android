@@ -3,14 +3,14 @@ package org.crazydan.studio.android.echarts
 import org.crazydan.studio.android.echarts.option.Color
 import org.crazydan.studio.android.echarts.option.DataZoom
 import org.crazydan.studio.android.echarts.option.DataZoomList
-import org.crazydan.studio.android.echarts.option.coord.Grid
-import org.crazydan.studio.android.echarts.option.coord.GridXAxis
-import org.crazydan.studio.android.echarts.option.coord.GridYAxis
 import org.crazydan.studio.android.echarts.option.Legend
 import org.crazydan.studio.android.echarts.option.Series
 import org.crazydan.studio.android.echarts.option.SeriesList
 import org.crazydan.studio.android.echarts.option.Theme
 import org.crazydan.studio.android.echarts.option.Tooltip
+import org.crazydan.studio.android.echarts.option.coord.Grid
+import org.crazydan.studio.android.echarts.option.coord.GridXAxis
+import org.crazydan.studio.android.echarts.option.coord.GridYAxis
 
 /**
  *
@@ -22,7 +22,7 @@ annotation class EChartsOption
 
 interface ECharts {
 
-    companion object : ECharts {
+    companion object {
 
         fun option(block: Option.() -> Unit): Option = Option().apply(block)
     }
@@ -51,14 +51,14 @@ interface ECharts {
         /** [数据区域缩放配置](https://echarts.apache.org/en/option.html#dataZoom) */
         fun dataZoom(block: DataZoomList.() -> Unit) {
             val list = mutableListOf<DataZoom>()
-            DataZoomList(holder = list).apply(block)
+            DataZoomList(holder = list).block()
 
             holder.dataZoom = list.toList()
         }
 
         /** 系列配置 */
         fun series(block: SeriesList.() -> Unit) {
-            SeriesList(holder).apply(block)
+            SeriesList(holder).block()
         }
 
         /** [Grid 配置](https://echarts.apache.org/en/option.html#grid) */

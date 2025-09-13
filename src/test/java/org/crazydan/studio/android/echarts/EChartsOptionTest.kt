@@ -30,13 +30,13 @@ class EChartsOptionTest {
                 )
             }
             tooltip {
-                triggerBy { axis() }
+                triggerBy { axis }
                 axisPointer {
-                    type { cross() }
+                    type { cross }
                 }
             }
             legend {
-                type { plain() }
+                type { plain }
                 margin {
                     top(20.px)
                 }
@@ -50,13 +50,13 @@ class EChartsOptionTest {
                 }
 
                 inside {
-                    filterMode { weakFilter() }
+                    filterMode { weakFilter }
                     window {
                         range(0.idx, 10.idx)
                     }
                 }
                 slider {
-                    filterMode { filter() }
+                    filterMode { filter }
                     margin {
                         top(90f.pct)
                         right(10f.pct)
@@ -68,186 +68,207 @@ class EChartsOptionTest {
             }
         }
 
-        option.also {
-            it.grid(id = "grid:0") {
-                showBorder(false)
-                margin {
-                    horizontal(10f.pct)
-                    bottom(15f.pct)
-                }
+        option.grid(id = "grid:0") {
+            showBorder(false)
+            margin {
+                horizontal(10f.pct)
+                bottom(15f.pct)
+            }
 
-                xAxis(id = "grid:0:x:0") {
-                    position { bottom(5.px) }
-                    axisTick { alignWithLabel(true) }
+            xAxis(id = "grid:0:x:0") {
+                position { bottom(5.px) }
+                axisTick { alignWithLabel(true) }
 
-                    type {
-                        category {
-                            data {
-                                item("2021-10-11") {}
-                                item("2021-10-12") {}
-                                item("2021-10-13") {}
-                            }
+                type {
+                    category {
+                        data {
+                            item("2021-10-11") {}
+                            item("2021-10-12") {}
+                            item("2021-10-13") {}
                         }
                     }
                 }
-                yAxis(id = "grid:0:y:0") {
-                    position { left() }
+            }
+            yAxis(id = "grid:0:y:0") {
+                position { left() }
 
-                    name("血糖 (mmol/L)") { position { center() } }
-                    type { value { fromZero(true) } }
-                    maxValue(20f)
+                name("血糖 (mmol/L)") { position { middle() } }
+                type { value { fromZero(true) } }
+                maxValue(40f)
 
-                    markLine {
-                        value(3.9f)
-                        name("<血糖>下限 (3.9 mmol/L)")
-                        label {
-                            formatter("{b}")
-                            position { insideStartTop() }
+//                    markLine {
+//                        value(3.9f)
+//                        name("<血糖>下限 (3.9 mmol/L)")
+//                        label {
+//                            formatter("{b}")
+//                            position { insideStartTop() }
+//                        }
+//                    }
+//                    markLine {
+//                        value(15f)
+//                        name("<血糖>上限 (15 mmol/L)")
+//                        label {
+//                            formatter("{b}")
+//                            position { insideStartBottom() }
+//                        }
+//                    }
+            }
+        }
+
+        option.series {
+            line {
+                name("S1")
+                colorBy { data }
+                connectNulls(false)
+
+                xAxisId("grid:0:x:0")
+                yAxisId("grid:0:y:0")
+            }
+            line {
+                name("S2")
+                connectNulls(true)
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    item(0, 10) {}
+                    item(1, null) {}
+                    item(2, 5) {}
+                }
+
+                markArea {
+                    byData {
+                        name("数据区间")
+                        label { formatter("{b}") }
+
+                        start {
+                            byDimension { max("y") }
+                        }
+                        end {
+                            byDimension { min("y") }
                         }
                     }
-                    markLine {
-                        value(15f)
-                        name("<血糖>上限 (15 mmol/L)")
+
+                    byData {
+                        name("观察窗口")
+                        label { formatter("{b}") }
+
+                        start {
+                            byCoordinate(x = 1, y = 3f)
+                        }
+                        end {
+                            byCoordinate(x = 2, y = 19f)
+                        }
+                    }
+                    byYAxis {
+                        value(6.1f, 7.8f)
+                        name("空腹 8h (6.1 ~ 7.8 mmol/L)")
                         label {
+                            position { insideLeft }
                             formatter("{b}")
-                            position { insideStartBottom() }
                         }
                     }
                 }
             }
 
-            it.series {
-                line {
-                    name("S1")
-                    colorBy { data() }
-                    connectNulls(false)
-                    xAxisId("grid:0:x:0")
-                    yAxisId("grid:0:y:0")
-                }
-                line {
-                    name("S2")
-                    connectNulls(true)
+            candlestick {
+                name("S3")
 
-                    data {
-                        dimension("x", "y") {
-                            x("x")
-                            y("y")
-                        }
-
-                        item(0, 10) {}
-                        item(1, null) {}
+                data {
+                    dimension("x", "open", "close", "lowest", "highest") {
+                        x("x")
+                        y("open", "close", "highest", "lowest")
+                        tooltip("open" to "最早", "close" to "最晚", "lowest" to "最高", "highest" to "最低")
                     }
 
-                    markArea {
-                        byPoint {
-                            name("数据区间")
-
-                            start {
-                                byDataDimension { max("highest") }
-                            }
-                            end {
-                                byDataDimension { min("lowest") }
-                            }
-                        }
-
-                        byPoint {
-                            name("观察窗口")
-
-                            start {
-                                byCoordinate(x = 1, y = 3f)
-                            }
-                            end {
-                                byCoordinate(x = 4, y = 10f)
-                            }
-                        }
-                    }
-                    markArea {
-                        byYAxis {
-                            value(6.1f, 7.8f)
-                            name("空腹 8h (6.1 ~ 7.8 mmol/L)")
-                        }
-                    }
+                    item(0, 10, 11, 10, 13) {}
+                    item(1, 8, 6, 10, 21) {}
+                    item(2, 5, 9, 23, 31) {}
                 }
 
-                candlestick {
-                    name("S3")
-
-                    data {
-                        dimension("x", "open", "close", "lowest", "highest") {
-                            x("x")
-                            y("open", "close", "highest", "lowest")
-                            tooltip("open" to "最早", "close" to "最晚", "lowest" to "最高", "highest" to "最低")
+                markLine {
+                    byData {
+                        name("最大差异")
+                        symbol {
+                            shape { circle }
+                            size(10)
+                        }
+                        label {
+                            position { middle }
+                            formatter("{b}")
                         }
 
-                        item(0, 10, 11, 10, 13) {}
-                        item(1, 8, 6, 10, 21) {}
-                    }
-
-                    markLine {
-                        byPoint {
-                            name("最大差异")
-                            symbol { circle(10) }
-                            label {
-                                position { middle() }
-                                formatter("{b}")
-                            }
-
-                            start {
-                                byDataDimension { max("highest") }
-                            }
-                            end {
-                                byDataDimension { min("lowest") }
-                                symbol { rotate(0) }
-                            }
+                        start {
+                            byDimension { max("highest") }
                         }
-                        byPoint {
-                            symbol {
-                                pin(30)
-                                rotate(180)
-                            }
-
-                            start {
-                                byCoordinate(x = 1, y = 3.1f)
-                            }
-                            end {
-                                byCoordinate(x = 4, y = 9.1f)
-                            }
+                        end {
+                            byDimension { min("lowest") }
+                            symbol { rotate(0) }
                         }
                     }
-                    markLine {
-                        byXAxis {
-                            value("2021-10-12")
-                            name("就医后")
-                            label {
-                                position { insideStartTop() }
-                                formatter("{b}")
-                            }
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(30)
+                            rotate(180)
                         }
 
-                        byYAxis {
-                            value((10f))
-                            name("<餐后 2h>上限 (10 mmol/L)")
-                            label {
-                                position { insideStartBottom() }
-                                formatter("{b}")
-                            }
+                        start {
+                            byCoordinate(x = 1, y = 3.1f)
+                        }
+                        end {
+                            byCoordinate(x = 2, y = 15f)
+                        }
+                    }
+                    byXAxis {
+                        value("2021-10-12")
+                        name("就医后")
+                        label {
+                            position { insideStartTop }
+                            formatter("{b}")
                         }
                     }
 
-                    markPoint {
-                        symbol { pin(50) }
-                        byDataDimension { max("highest") }
+                    byYAxis {
+                        value(10f)
+                        name("<餐后 2h>上限 (10 mmol/L)")
+                        label {
+                            position { insideStartBottom }
+                            formatter("{b}")
+                        }
                     }
-                    markPoint {
-                        symbol { pin(50) }
-                        byDataDimension { min("lowest") }
+                }
+
+                markPoint {
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(50)
+                        }
+                        byDimension { max("highest") }
                     }
-                    markPoint {
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(50)
+                        }
+                        byDimension { min("lowest") }
+                    }
+                    byData {
                         name("Start")
-                        label { formatter("{b}") }
+                        label {
+                            position { bottom }
+                            formatter("{b}")
+                        }
 
-                        symbol { circle(50) }
-                        byCoordinate(x = 1, y = 10f)
+                        symbol {
+                            shape { circle }
+                            size(50)
+                        }
+                        byCoordinate(x = 1, y = 15f)
                     }
                 }
             }

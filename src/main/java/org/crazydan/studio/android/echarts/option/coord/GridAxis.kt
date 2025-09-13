@@ -32,7 +32,7 @@ class GridXAxis(
      * [Grid] 默认将第一个 x 轴放置于底部（`bottom`），第二个 x 轴则放置在第一个 x 轴的另一侧（`top`）
      */
     fun position(block: GridXAxisPosition.() -> Unit) {
-        GridXAxisPosition(holder).apply(block)
+        GridXAxisPosition(holder).block()
     }
 }
 
@@ -63,7 +63,7 @@ class GridYAxis(
      * [Grid] 默认将第一个 y 轴放置于左侧（`left`），第二个 y 轴则放置在第一个 y 轴的另一侧（`right`）
      */
     fun position(block: GridYAxisPosition.() -> Unit) {
-        GridYAxisPosition(holder).apply(block)
+        GridYAxisPosition(holder).block()
     }
 }
 
@@ -89,12 +89,12 @@ open class GridAxis(
     /** 坐标轴名称 */
     fun name(value: String, block: GridAxisName.() -> Unit) {
         holder.name = value
-        GridAxisName(holder).apply(block)
+        GridAxisName(holder).block()
     }
 
     /** 坐标轴类型 */
     fun type(block: GridAxisType.() -> Unit) {
-        GridAxisType(holder).apply(block)
+        GridAxisType(holder).block()
     }
 
     /** 坐标轴刻度最小值 */
@@ -141,12 +141,12 @@ class GridAxisName(
 ) {
 
     enum class Position {
-        Start, Center, End
+        Start, Middle, End
     }
 
     /** 显示位置 */
     fun position(block: GridAxisNamePosition.() -> Unit) {
-        GridAxisNamePosition(holder).apply(block)
+        GridAxisNamePosition(holder).block()
     }
 }
 
@@ -159,8 +159,8 @@ class GridAxisNamePosition(
         holder.nameLocation = GridAxisName.Position.Start
     }
 
-    fun center() {
-        holder.nameLocation = GridAxisName.Position.Center
+    fun middle() {
+        holder.nameLocation = GridAxisName.Position.Middle
     }
 
     fun end() {
@@ -178,7 +178,7 @@ class GridAxisType(
         holder.type = GridAxis.Type.Value
 
         block?.let {
-            GridAxisTypeValue(holder).apply(it)
+            GridAxisTypeValue(holder).block()
         }
     }
 
@@ -187,7 +187,7 @@ class GridAxisType(
         holder.type = GridAxis.Type.Category
 
         block?.let {
-            GridAxisDataListByType(holder).apply(it)
+            GridAxisDataListByType(holder).block()
         }
     }
 
@@ -309,7 +309,7 @@ class GridAxisDataListByType(
     /** 坐标轴标签列表 */
     fun data(block: GridAxisDataList.() -> Unit) {
         val items = mutableListOf<GridAxisData>()
-        GridAxisDataList(items).apply(block)
+        GridAxisDataList(items).block()
 
         holder.data = items.toList()
     }

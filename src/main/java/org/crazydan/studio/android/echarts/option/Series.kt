@@ -3,8 +3,9 @@ package org.crazydan.studio.android.echarts.option
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
 import org.crazydan.studio.android.echarts.SeriesListHolder
-import org.crazydan.studio.android.echarts.listToJSON
-import org.crazydan.studio.android.echarts.objToJSON
+import org.crazydan.studio.android.echarts.option.marker.MarkArea
+import org.crazydan.studio.android.echarts.option.marker.MarkLine
+import org.crazydan.studio.android.echarts.option.marker.MarkPoint
 import org.crazydan.studio.android.echarts.option.series.SeriesCandlestick
 import org.crazydan.studio.android.echarts.option.series.SeriesLine
 
@@ -54,8 +55,8 @@ open class Series(
     }
 
     /** 从调色盘中取色的策略 */
-    fun colorBy(block: SeriesColorBy.() -> Unit) {
-        SeriesColorBy(holder).apply(block)
+    fun colorBy(block: SeriesColorByScope.() -> ColorBy) {
+        holder.colorBy = SeriesColorByScope().block()
     }
 
     /** 系列的数据列表 */
@@ -78,6 +79,21 @@ open class Series(
     fun yAxisId(value: String) {
         holder.yAxisId = value
     }
+
+    /** 标记线配置 */
+    fun markLine(block: MarkLine.() -> Unit) {
+        holder.markLine = MarkLine().apply(block)
+    }
+
+    /** 标记点配置 */
+    fun markPoint(block: MarkPoint.() -> Unit) {
+        holder.markPoint = MarkPoint().apply(block)
+    }
+
+    /** 标记区域配置 */
+    fun markArea(block: MarkArea.() -> Unit) {
+        holder.markArea = MarkArea().apply(block)
+    }
 }
 
 open class SeriesHolder(
@@ -92,9 +108,9 @@ open class SeriesHolder(
     var xAxisId: String? = null,
     var yAxisId: String? = null,
 
-//    var markLine: ? = null,
-//    var markArea: ? = null,
-//    var markPoint: ? = null,
+    var markLine: MarkLine? = null,
+    var markArea: MarkArea? = null,
+    var markPoint: MarkPoint? = null,
 ) : JSONable
 
 data class SeriesDimension(
@@ -109,22 +125,6 @@ data class SeriesEncode(
 ) : JSONable
 
 @EChartsOption
-class SeriesColorBy(
-    private val holder: SeriesHolder,
-) {
-
-    /** 按照系列分配调色盘中的颜色，同一系列中的所有数据都是用相同的颜色 */
-    fun series() {
-        holder.colorBy = Series.ColorBy.Series
-    }
-
-    /** 按照数据项分配调色盘中的颜色，每个数据项都使用不同的颜色 */
-    fun data() {
-        holder.colorBy = Series.ColorBy.Data
-    }
-}
-
-@EChartsOption
 class SeriesDataList(
     private val holder: SeriesHolder,
     private val items: MutableList<SeriesData>
@@ -133,7 +133,7 @@ class SeriesDataList(
     /** [item] 中每列数据的列配置 */
     fun dimension(vararg names: String, block: SeriesDataDimension.() -> Unit) {
         val dimHolder = SeriesDataDimensionHolder()
-        SeriesDataDimension(dimHolder).apply(block)
+        SeriesDataDimension(dimHolder).block()
 
         holder.dimensions = names.map {
             SeriesDimension(
@@ -202,75 +202,10 @@ data class SeriesDataDimensionHolder(
     var tooltip: Map<String, String>? = null,
 )
 
-@EChartsOption
-class SeriesMarkLine(
+class SeriesColorByScope() {
+    /** 按照系列分配调色盘中的颜色，同一系列中的所有数据都是用相同的颜色 */
+    val series = Series.ColorBy.Series
 
-) {}
-
-data class SeriesLabel(
-    val show: Boolean = true,
-    /** https://echarts.apache.org/en/option.html#series-line.markArea.label */
-    val formatter: String? = null,
-) : JSONable
-
-data class SeriesMarkLineHolder(
-    val silent: Boolean = true,
-    val label: SeriesLabel? = null,
-    val data: List<Range>,
-) : JSONable {
-
-    data class Range(
-        val from: SeriesMarkData,
-        val to: SeriesMarkData? = null,
-    ) : JSONable {
-        override fun toJSON(): String =
-            if (to != null) {
-                listToJSON(
-                    listOf(from, to)
-                )
-            } else {
-                objToJSON(from)
-            }
-    }
-}
-
-data class SeriesMarkAreaHolder(
-    val silent: Boolean = true,
-    val label: SeriesLabel? = null,
-    val data: List<Range>,
-) : JSONable {
-
-    data class Range(
-        val from: Number,
-        val to: Number,
-    ) : JSONable {
-        override fun toJSON(): String =
-            listToJSON(
-                listOf(from, to)
-            )
-    }
-}
-
-data class SeriesMarkPointHolder(
-    val silent: Boolean = true,
-    val label: SeriesLabel? = null,
-    val data: List<SeriesMarkData>,
-) : JSONable
-
-data class SeriesMarkData(
-    val type: Type = Type.None,
-    val valueIndex: Number? = null,
-    val valueDim: String? = null,
-    val symbol: Symbol? = null,
-    val symbolSize: Int? = null,
-    val label: SeriesLabel? = null,
-) : JSONable {
-
-    enum class Type {
-        Min, Max, Average, Median, None
-    }
-
-    enum class Symbol {
-        Circle, Rect, RoundRect, Triangle, Diamond, Pin, Arrow, None
-    }
+    /** 按照数据项分配调色盘中的颜色，每个数据项都使用不同的颜色 */
+    val data = Series.ColorBy.Data
 }

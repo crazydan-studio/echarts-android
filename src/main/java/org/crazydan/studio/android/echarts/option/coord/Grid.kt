@@ -37,7 +37,7 @@ class Grid(
 
     /** 与容器周边的间隔 */
     fun margin(block: Margin.() -> Unit) {
-        Margin(holder).apply(block)
+        Margin(holder).block()
     }
 
     /** [x 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
