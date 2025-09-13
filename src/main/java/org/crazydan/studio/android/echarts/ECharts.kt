@@ -67,7 +67,11 @@ interface ECharts {
                 throw IllegalArgumentException("grid id can not be null or blank when multiple grids are configured")
             }
 
-            val grid = Grid(id, holder).apply(block)
+            val grid = Grid(
+                id = id,
+                axisHolder = holder,
+            ).apply(block)
+
             holder.grid.add(grid)
         }
     }
@@ -88,7 +92,7 @@ class OptionHolder(
     val yAxis: MutableList<GridYAxis> = mutableListOf(),
 
     // 其他坐标系 ...
-) : JSONable, ThemeHolder, GridAxisHolder, SeriesListHolder {
+) : JSONable, ThemeHolder, GridAxisHolder {
 
     override fun backgroundColor(value: Color) {
         backgroundColor = value
@@ -116,11 +120,11 @@ interface ThemeHolder {
     fun seriesColors(value: List<Color>)
 }
 
-interface GridAxisHolder {
-    fun addXAxis(value: GridXAxis)
-    fun addYAxis(value: GridYAxis)
-}
-
 interface SeriesListHolder {
     fun addSeries(value: Series)
+}
+
+interface GridAxisHolder : SeriesListHolder {
+    fun addXAxis(value: GridXAxis)
+    fun addYAxis(value: GridYAxis)
 }

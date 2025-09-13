@@ -8,6 +8,8 @@ import org.crazydan.studio.android.echarts.JSONable
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-12
  */
+typealias MarkLineByAxisFactory = MarkLineByAxis.() -> Unit
+
 @EChartsOption
 class MarkLine() : JSONable {
     private val holder = MarkLineHolder()
@@ -48,7 +50,7 @@ class MarkLine() : JSONable {
     }
 
     /** 与 x 轴垂直的标记线配置 */
-    fun byXAxis(block: MarkLineByAxis.() -> Unit) {
+    fun byXAxis(block: MarkLineByAxisFactory) {
         val p = MarkDataPointHolder()
         MarkLineByAxis(true, p).block()
 
@@ -56,7 +58,7 @@ class MarkLine() : JSONable {
     }
 
     /** 与 y 轴垂直的标记线配置 */
-    fun byYAxis(block: MarkLineByAxis.() -> Unit) {
+    fun byYAxis(block: MarkLineByAxisFactory) {
         val p = MarkDataPointHolder()
         MarkLineByAxis(false, p).block()
 
@@ -64,7 +66,7 @@ class MarkLine() : JSONable {
     }
 }
 
-private class MarkLineHolder(
+class MarkLineHolder(
     var silent: Boolean = true,
 
     val data: MutableList<Any> = mutableListOf(),

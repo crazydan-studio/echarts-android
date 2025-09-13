@@ -92,26 +92,26 @@ class EChartsOptionTest {
             yAxis(id = "grid:0:y:0") {
                 position { left() }
 
-                name("血糖 (mmol/L)") { position { middle() } }
                 type { value { fromZero(true) } }
+                name("血糖 (mmol/L)") { position { middle() } }
                 maxValue(40f)
 
-//                    markLine {
-//                        value(3.9f)
-//                        name("<血糖>下限 (3.9 mmol/L)")
-//                        label {
-//                            formatter("{b}")
-//                            position { insideStartTop() }
-//                        }
-//                    }
-//                    markLine {
-//                        value(15f)
-//                        name("<血糖>上限 (15 mmol/L)")
-//                        label {
-//                            formatter("{b}")
-//                            position { insideStartBottom() }
-//                        }
-//                    }
+                markLine {
+                    value(3.9f)
+                    name("<血糖>下限 (3.9 mmol/L)")
+                    label {
+                        formatter("{b}")
+                        position { insideStartTop }
+                    }
+                }
+                markLine {
+                    value(15f)
+                    name("<血糖>上限 (15 mmol/L)")
+                    label {
+                        formatter("{b}")
+                        position { insideStartBottom }
+                    }
+                }
             }
         }
 
@@ -163,6 +163,7 @@ class EChartsOptionTest {
                             byCoordinate(x = 2, y = 19f)
                         }
                     }
+
                     byYAxis {
                         value(6.1f, 7.8f)
                         name("空腹 8h (6.1 ~ 7.8 mmol/L)")
@@ -209,6 +210,7 @@ class EChartsOptionTest {
                             symbol { rotate(0) }
                         }
                     }
+
                     byData {
                         symbol {
                             shape { pin }
@@ -223,6 +225,7 @@ class EChartsOptionTest {
                             byCoordinate(x = 2, y = 15f)
                         }
                     }
+
                     byXAxis {
                         value("2021-10-12")
                         name("就医后")
@@ -257,6 +260,7 @@ class EChartsOptionTest {
                         }
                         byDimension { min("lowest") }
                     }
+
                     byData {
                         name("Start")
                         label {

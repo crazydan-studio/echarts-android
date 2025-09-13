@@ -5,6 +5,8 @@ import org.crazydan.studio.android.echarts.GridAxisHolder
 import org.crazydan.studio.android.echarts.JSONable
 import org.crazydan.studio.android.echarts.option.Margin
 import org.crazydan.studio.android.echarts.option.MarginHolder
+import org.crazydan.studio.android.echarts.option.SeriesList
+import org.crazydan.studio.android.echarts.option.marker.MarkLineByAxisFactory
 
 /**
  * 直角坐标系 Grid
@@ -42,22 +44,50 @@ class Grid(
 
     /** [x 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
     fun xAxis(id: String? = null, block: GridXAxis.() -> Unit) {
-        axisHolder.addXAxis(
-            GridXAxis(
-                id = id,
-                gridId = holder.id
-            ).apply(block)
-        )
+        val markLines = mutableListOf<MarkLineByAxisFactory>()
+        val axis = GridXAxis(
+            id = id,
+            gridId = holder.id,
+            markLinesHolder = markLines,
+        ).apply(block)
+
+        axisHolder.addXAxis(axis)
+
+        if (markLines.isNotEmpty()) {
+            SeriesList(axisHolder).line {
+                id?.let { xAxisId(it) }
+                markLine {
+                    silent(true)
+                    markLines.forEach { block ->
+                        byXAxis(block)
+                    }
+                }
+            }
+        }
     }
 
     /** [y 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
     fun yAxis(id: String? = null, block: GridYAxis.() -> Unit) {
-        axisHolder.addYAxis(
-            GridYAxis(
-                id = id,
-                gridId = holder.id
-            ).apply(block)
-        )
+        val markLines = mutableListOf<MarkLineByAxisFactory>()
+        val axis = GridYAxis(
+            id = id,
+            gridId = holder.id,
+            markLinesHolder = markLines,
+        ).apply(block)
+
+        axisHolder.addYAxis(axis)
+
+        if (markLines.isNotEmpty()) {
+            SeriesList(axisHolder).line {
+                id?.let { yAxisId(it) }
+                markLine {
+                    silent(true)
+                    markLines.forEach { block ->
+                        byYAxis(block)
+                    }
+                }
+            }
+        }
     }
 }
 

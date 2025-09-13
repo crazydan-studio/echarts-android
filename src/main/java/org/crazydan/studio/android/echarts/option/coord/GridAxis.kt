@@ -4,6 +4,7 @@ import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
 import org.crazydan.studio.android.echarts.option.Size
 import org.crazydan.studio.android.echarts.option.SizeScope
+import org.crazydan.studio.android.echarts.option.marker.MarkLineByAxisFactory
 
 /**
  * 直角坐标系 [Grid] 中的 x 轴
@@ -23,8 +24,9 @@ import org.crazydan.studio.android.echarts.option.SizeScope
 class GridXAxis(
     private val id: String?,
     private val gridId: String?,
-    private val holder: GridAxisHolder = GridAxisHolder(id = id, gridId = gridId),
-) : GridAxis(holder) {
+    private val markLinesHolder: MutableList<MarkLineByAxisFactory>,
+    private val axisHolder: GridAxisHolder = GridAxisHolder(id = id, gridId = gridId),
+) : GridAxis(axisHolder) {
 
     /**
      * x 轴的位置
@@ -32,7 +34,12 @@ class GridXAxis(
      * [Grid] 默认将第一个 x 轴放置于底部（`bottom`），第二个 x 轴则放置在第一个 x 轴的另一侧（`top`）
      */
     fun position(block: GridXAxisPosition.() -> Unit) {
-        GridXAxisPosition(holder).block()
+        GridXAxisPosition(axisHolder).block()
+    }
+
+    /** 在 x 轴上的标记线配置 */
+    fun markLine(block: MarkLineByAxisFactory) {
+        markLinesHolder.add(block)
     }
 }
 
@@ -54,8 +61,9 @@ class GridXAxis(
 class GridYAxis(
     private val id: String?,
     private val gridId: String?,
-    private val holder: GridAxisHolder = GridAxisHolder(id = id, gridId = gridId),
-) : GridAxis(holder) {
+    private val markLinesHolder: MutableList<MarkLineByAxisFactory>,
+    private val axisHolder: GridAxisHolder = GridAxisHolder(id = id, gridId = gridId),
+) : GridAxis(axisHolder) {
 
     /**
      * y 轴的位置
@@ -63,7 +71,12 @@ class GridYAxis(
      * [Grid] 默认将第一个 y 轴放置于左侧（`left`），第二个 y 轴则放置在第一个 y 轴的另一侧（`right`）
      */
     fun position(block: GridYAxisPosition.() -> Unit) {
-        GridYAxisPosition(holder).block()
+        GridYAxisPosition(axisHolder).block()
+    }
+
+    /** 在 y 轴上的标记线配置 */
+    fun markLine(block: MarkLineByAxisFactory) {
+        markLinesHolder.add(block)
     }
 }
 
