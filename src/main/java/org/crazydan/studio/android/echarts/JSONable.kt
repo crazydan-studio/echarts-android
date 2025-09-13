@@ -93,6 +93,7 @@ private fun jsonValue(value: Any?): String {
                 value.toString()
                     .replace("\\", "\\\\")
                     .replace("\"", "\\\"")
+                    .replace("\n", "\\\\n")
             "\"$str\""
         }
     }

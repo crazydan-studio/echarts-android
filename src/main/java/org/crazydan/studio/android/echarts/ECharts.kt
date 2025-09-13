@@ -56,12 +56,12 @@ interface ECharts {
             holder.dataZoom = list.toList()
         }
 
-        /** 系列配置 */
+        /** 系列配置：可重复调用以累积添加一个或多个系列 */
         fun series(block: SeriesList.() -> Unit) {
             SeriesList(holder).block()
         }
 
-        /** [Grid 配置](https://echarts.apache.org/en/option.html#grid) */
+        /** [Grid 配置](https://echarts.apache.org/en/option.html#grid)：可重复调用以累积添加一个或多个 [Grid] */
         fun grid(id: String? = null, block: Grid.() -> Unit) {
             if (holder.grid.isNotEmpty() && id.isNullOrBlank()) {
                 throw IllegalArgumentException("grid id can not be null or blank when multiple grids are configured")
