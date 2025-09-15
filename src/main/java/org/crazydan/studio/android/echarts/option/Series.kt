@@ -1,5 +1,6 @@
 package org.crazydan.studio.android.echarts.option
 
+import androidx.annotation.FloatRange
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
 import org.crazydan.studio.android.echarts.SeriesListHolder
@@ -8,6 +9,7 @@ import org.crazydan.studio.android.echarts.option.marker.MarkLine
 import org.crazydan.studio.android.echarts.option.marker.MarkPoint
 import org.crazydan.studio.android.echarts.option.series.SeriesCandlestick
 import org.crazydan.studio.android.echarts.option.series.SeriesLine
+import org.crazydan.studio.android.echarts.option.series.SeriesScatter
 
 /**
  *
@@ -32,6 +34,13 @@ class SeriesList(
 
         holder.addSeries(series)
     }
+
+    /** [散点（气泡）图配置](https://echarts.apache.org/zh/option.html#series-scatter) */
+    fun scatter(block: SeriesScatter.() -> Unit) {
+        val series = SeriesScatter().apply(block)
+
+        holder.addSeries(series)
+    }
 }
 
 @EChartsOption
@@ -40,7 +49,7 @@ open class Series(
 ) : JSONable {
 
     enum class Type {
-        Candlestick, Line, Bar, Pie
+        Candlestick, Line, Bar, Pie, Scatter
     }
 
     enum class ColorBy {
@@ -49,7 +58,16 @@ open class Series(
 
     override fun toJSON(): String = holder.toJSON()
 
-    /** 系列名称，用于 [Tooltip] 的显示，[Legend] 的图例筛选 */
+    /** 组件 ID。默认不指定。指定则可用于在 option 或者 API 中引用组件 */
+    fun id(value: String) {
+        holder.id = value
+    }
+
+    /**
+     * 系列名称，用于 [Tooltip] 的显示，[Legend] 的图例筛选
+     *
+     * 多个同名的系列将被视为一个组合，在 [Legend] 区域会一起控制显隐
+     */
     fun name(value: String) {
         holder.name = value
     }
@@ -80,6 +98,11 @@ open class Series(
         holder.yAxisId = value
     }
 
+    /** 标记图形配置 */
+    fun symbol(block: SeriesSymbol.() -> Unit) {
+        SeriesSymbol(holder).block()
+    }
+
     /** 标记线配置 */
     fun markLine(block: MarkLine.() -> Unit) {
         holder.markLine = MarkLine().apply(block)
@@ -99,7 +122,9 @@ open class Series(
 open class SeriesHolder(
     val type: Series.Type,
 
+    var id: String? = null,
     var name: String? = null,
+
     var colorBy: Series.ColorBy = Series.ColorBy.Series,
     var dimensions: List<SeriesDimension>? = null,
     var encode: SeriesEncode? = null,
@@ -108,9 +133,16 @@ open class SeriesHolder(
     var xAxisId: String? = null,
     var yAxisId: String? = null,
 
+    var symbol: SeriesSymbol.Shape? = null,
+    var symbolSize: Int? = null,
+    var symbolRotate: Number? = null,
+
     var markLine: MarkLine? = null,
     var markArea: MarkArea? = null,
     var markPoint: MarkPoint? = null,
+
+    var lineStyle: SeriesLineStyle? = null,
+    var areaStyle: SeriesAreaStyle? = null,
 ) : JSONable
 
 data class SeriesDimension(
@@ -209,3 +241,105 @@ class SeriesColorByScope() {
     /** 按照数据项分配调色盘中的颜色，每个数据项都使用不同的颜色 */
     val data = Series.ColorBy.Data
 }
+
+@EChartsOption
+class SeriesSymbol(
+    private val holder: SeriesHolder,
+) {
+
+    enum class Shape {
+        Circle, Rect, RoundRect, Triangle, Diamond, Pin, Arrow, None
+    }
+
+    /** 标记的形状 */
+    fun shape(block: SeriesSymbolShapeScope.() -> Shape) {
+        holder.symbol = SeriesSymbolShapeScope().block()
+    }
+
+    /** 标记的大小 */
+    fun size(value: Int? = null) {
+        holder.symbolSize = value
+    }
+
+    /** 标记的旋转角度：正值表示逆时针旋转 */
+    fun rotate(value: Number) {
+        holder.symbolRotate = value
+    }
+}
+
+class SeriesSymbolShapeScope {
+    val circle = SeriesSymbol.Shape.Circle
+    val rect = SeriesSymbol.Shape.Rect
+    val roundRect = SeriesSymbol.Shape.RoundRect
+    val triangle = SeriesSymbol.Shape.Triangle
+    val diamond = SeriesSymbol.Shape.Diamond
+    val pin = SeriesSymbol.Shape.Pin
+    val arrow = SeriesSymbol.Shape.Arrow
+    val none = SeriesSymbol.Shape.None
+}
+
+@EChartsOption
+class SeriesLineStyle() : JSONable {
+    private val holder = SeriesLineStyleHolder()
+
+    enum class Type {
+        Solid, Dashed, Dotted
+    }
+
+    override fun toJSON(): String = holder.toJSON()
+
+    /** 颜色 */
+    fun color(value: Color) {
+        holder.color = value;
+    }
+
+    /** 宽度 */
+    fun width(value: Int) {
+        holder.width = value;
+    }
+
+    /** 类型 */
+    fun type(block: SeriesLineStyleScope.() -> Type) {
+        holder.type = SeriesLineStyleScope().block()
+    }
+
+    /** 透明度 */
+    fun opacity(@FloatRange(from = 0.0, to = 1.0) value: Float) {
+        holder.opacity = value;
+    }
+}
+
+data class SeriesLineStyleHolder(
+    var color: Color? = null,
+    var width: Int? = null,
+    var type: SeriesLineStyle.Type? = null,
+    var opacity: Float? = null,
+) : JSONable
+
+class SeriesLineStyleScope {
+    val solid = SeriesLineStyle.Type.Solid
+    val dashed = SeriesLineStyle.Type.Dashed
+    val dotted = SeriesLineStyle.Type.Dotted
+}
+
+@EChartsOption
+class SeriesAreaStyle() : JSONable {
+    private val holder = SeriesAreaStyleHolder()
+
+    override fun toJSON(): String = holder.toJSON()
+
+    /** 颜色 */
+    fun color(value: Color) {
+        holder.color = value;
+    }
+
+    /** 透明度 */
+    fun opacity(@FloatRange(from = 0.0, to = 1.0) value: Float) {
+        holder.opacity = value;
+    }
+}
+
+data class SeriesAreaStyleHolder(
+    var color: Color? = null,
+    var opacity: Float? = null,
+) : JSONable

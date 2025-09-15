@@ -7,17 +7,20 @@
 
 		<style>
 			*{
-					-webkit-user-select: none;
-					user-select: none;
+				-webkit-user-select: none;
+				user-select: none;
 			}
 			body {
-					margin: 0px 0px 0px 0px;
+				margin: 0px 0px 0px 0px;
+				overflow: hidden;
 			}
 			body, #container {
-					width: 100%;
-					height: 100%;
+				width: 100%;
+				height: 100%;
 			}
 		</style>
+		<link rel="stylesheet" href="index.css">
+		<link rel="stylesheet" href="custom.css">
 	</head>
 	<body>
 		<div id="container"></div>
@@ -26,4 +29,5 @@
 	<!-- 定制 ECharts 库：https://echarts.apache.org/en/builder.html -->
 	<script src="echarts.min.js"></script>
 	<script src="index.js"></script>
+	<script src="custom.js"></script>
 </html>

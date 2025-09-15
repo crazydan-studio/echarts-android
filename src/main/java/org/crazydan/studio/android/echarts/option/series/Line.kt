@@ -2,7 +2,9 @@ package org.crazydan.studio.android.echarts.option.series
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.option.Series
+import org.crazydan.studio.android.echarts.option.SeriesAreaStyle
 import org.crazydan.studio.android.echarts.option.SeriesHolder
+import org.crazydan.studio.android.echarts.option.SeriesLineStyle
 
 /**
  * 折线/面积图
@@ -28,11 +30,38 @@ class SeriesLine(
     fun connectNulls(value: Boolean) {
         holder.connectNulls = value
     }
+
+    /** 数据堆叠：同个类目轴上系列配置相同的 stack name 值可以堆叠放置 */
+    fun stack(block: SeriesLineStack.() -> Unit) {
+        SeriesLineStack(holder).block()
+    }
+
+    /** 线条样式配置 */
+    fun lineStyle(block: SeriesLineStyle.() -> Unit) {
+        holder.lineStyle = SeriesLineStyle().apply(block)
+    }
+
+    /** 区域填充样式配置。设置后显示成区域面积图 */
+    fun areaStyle(block: SeriesAreaStyle.() -> Unit) {
+        holder.areaStyle = SeriesAreaStyle().apply(block)
+    }
 }
 
 class SeriesLineHolder(
     var connectNulls: Boolean = true,
     var smooth: Boolean = true,
+
+    var stack: String? = null,
 ) : SeriesHolder(
     type = Series.Type.Line,
 )
+
+@EChartsOption
+class SeriesLineStack(
+    private val holder: SeriesLineHolder,
+) {
+
+    fun name(value: String) {
+        holder.stack = value
+    }
+}

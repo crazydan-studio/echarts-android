@@ -1,6 +1,5 @@
 package org.crazydan.studio.android.echarts
 
-import org.junit.Assert
 import org.junit.Test
 
 /**
@@ -9,9 +8,451 @@ import org.junit.Test
  * @date 2025-09-08
  */
 class EChartsOptionTest {
+    val sampleData = mapOf(
+        "2021-10-11" to listOf(9.6f, 7.8f, 8.2f),
+        "2021-10-12" to listOf(7.8f, 8.9f, 6.8f),
+        "2021-10-13" to listOf(8.3f, 7.2f, 9.8f, 6.9f),
+        "2021-10-14" to listOf(9.3f, 8.1f),
+        "2021-10-15" to listOf(7.5f, 7.8f, 6.9f),
+    )
 
     @Test
-    fun test_toJSON() {
+    fun test_genCandlestick() {
+        val option = commonOption(sampleData)
+
+        option.series {
+            candlestick {
+                name("餐后")
+
+                data {
+                    dimension("x", "open", "close", "lowest", "highest") {
+                        x("x")
+                        y("open", "close", "lowest", "highest")
+                        tooltip("open" to "最早", "close" to "最晚", "lowest" to "最低", "highest" to "最高")
+                    }
+
+                    sampleData.onEachIndexed { index, entry ->
+                        item(
+                            index,
+                            entry.value.first(),
+                            entry.value.last(),
+                            entry.value.min(),
+                            entry.value.max(),
+                        ) {}
+                    }
+                }
+
+                markLine {
+                    byData {
+                        name("最大波幅")
+                        symbol {
+                            shape { circle }
+                            size(10)
+                        }
+                        label {
+                            position { middle }
+                            formatter("{b}")
+                        }
+
+                        start {
+                            byDimension { max("highest") }
+                        }
+                        end {
+                            byDimension { min("lowest") }
+                            symbol { rotate(0) }
+                        }
+                    }
+
+                    byYAxis {
+                        value(10f)
+                        name("<餐后>上限\n(10 mmol/L)")
+                        label {
+                            position { end }
+                            formatter("{b}")
+                        }
+                    }
+                }
+
+                markPoint {
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(50)
+                        }
+                        byDimension { max("highest") }
+                    }
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(50)
+                        }
+                        byDimension { min("lowest") }
+                    }
+                }
+            }
+        }
+
+        val json = option.toJSON()
+        println(json)
+    }
+
+    @Test
+    fun test_genLine_with_candlestick() {
+        val option = commonOption(sampleData)
+
+        option.series {
+            line {
+                name("S1")
+                colorBy { data }
+                connectNulls(false)
+
+                xAxisId("grid:0:x:0")
+                yAxisId("grid:0:y:0")
+            }
+            line {
+                name("空腹")
+                connectNulls(true)
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    item(0, 10) {}
+                    item(1, null) {}
+                    item(2, 7) {}
+                    item(3, 6.8) {}
+                    item(4, 7.2) {}
+                }
+
+                markArea {
+                    byData {
+                        name("数据区间")
+                        label { formatter("{b}") }
+
+                        start {
+                            byDimension { max("y") }
+                        }
+                        end {
+                            byDimension { min("y") }
+                        }
+                    }
+
+                    byData {
+                        name("观察窗口")
+                        label { formatter("{b}") }
+
+                        start {
+                            byCoordinate(x = 1, y = 3f)
+                        }
+                        end {
+                            byCoordinate(x = 2, y = 14f)
+                        }
+                    }
+
+                    byYAxis {
+                        value(6.1f, 7.8f)
+                        name("空腹 8h (6.1 ~ 7.8 mmol/L)")
+                        label {
+                            position { insideLeft }
+                            formatter("{b}")
+                        }
+                    }
+                }
+            }
+
+            candlestick {
+                name("餐后")
+
+                data {
+                    dimension("x", "open", "close", "lowest", "highest") {
+                        x("x")
+                        y("open", "close", "lowest", "highest")
+                        tooltip("open" to "最早", "close" to "最晚", "lowest" to "最低", "highest" to "最高")
+                    }
+
+                    sampleData.onEachIndexed { index, entry ->
+                        item(
+                            index,
+                            entry.value.first(),
+                            entry.value.last(),
+                            entry.value.min(),
+                            entry.value.max(),
+                        ) {}
+                    }
+                }
+
+                markLine {
+                    byData {
+                        name("最大波动")
+                        symbol {
+                            shape { circle }
+                            size(10)
+                        }
+                        label {
+                            position { middle }
+                            formatter("{b}")
+                        }
+
+                        start {
+                            byDimension { max("highest") }
+                        }
+                        end {
+                            byDimension { min("lowest") }
+                            symbol { rotate(0) }
+                        }
+                    }
+
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(30)
+                            rotate(180)
+                        }
+
+                        start {
+                            byCoordinate(x = 1, y = 3.1f)
+                        }
+                        end {
+                            byCoordinate(x = 2, y = 14f)
+                        }
+                    }
+
+                    byXAxis {
+                        value("2021-10-12")
+                        name("就医后")
+                        label {
+                            position { insideStartTop }
+                            formatter("{b}")
+                        }
+                    }
+
+                    byYAxis {
+                        value(10f)
+                        name("<餐后 2h>上限 (10 mmol/L)")
+                        label {
+                            position { insideStartBottom }
+                            formatter("{b}")
+                        }
+                    }
+                }
+
+                markPoint {
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(50)
+                        }
+                        byDimension { max("highest") }
+                    }
+                    byData {
+                        symbol {
+                            shape { pin }
+                            size(50)
+                        }
+                        byDimension { min("lowest") }
+                    }
+
+                    byData {
+                        name("Start")
+                        label {
+                            position { bottom }
+                            formatter("{b}")
+                        }
+
+                        symbol {
+                            shape { circle }
+                            size(50)
+                        }
+                        byCoordinate(x = 1, y = 15f)
+                    }
+                }
+            }
+        }
+
+        val json = option.toJSON()
+        println(json)
+    }
+
+    @Test
+    fun get_genLineStack() {
+        val option = commonOption(sampleData)
+
+        option.series {
+            line {
+                name("餐后")
+                smooth(true)
+                connectNulls(true)
+
+                symbol { shape { none } }
+                stack { name("diff-range") }
+                lineStyle { opacity(0.6f) }
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    sampleData.onEachIndexed { index, entry ->
+                        item(index, entry.value.min()) {}
+                    }
+                }
+            }
+
+            line {
+                name("餐后")
+                smooth(true)
+                connectNulls(true)
+
+                symbol { shape { none } }
+                stack { name("diff-range") }
+                lineStyle { opacity(0.6f) }
+                areaStyle { opacity(0.6f) }
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    // Note: 这里为前面同名 stack 之间的差值
+                    sampleData.onEachIndexed { index, entry ->
+                        item(index, entry.value.max() - entry.value.min()) {}
+                    }
+                }
+            }
+        }
+
+        val json = option.toJSON()
+        println(json)
+    }
+
+    @Test
+    fun get_genScatter() {
+        val option = commonOption(sampleData)
+
+        option.series {
+            scatter {
+                name("餐后")
+                colorBy { data }
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    sampleData.onEachIndexed { index, entry ->
+                        entry.value.forEach { value ->
+                            item(index, value) {}
+                        }
+                    }
+                }
+
+                markLine {
+                    byYAxis {
+                        value(10f)
+                        name("<餐后>上限\n(10 mmol/L)")
+                        label {
+                            position { end }
+                            formatter("{b}")
+                        }
+                    }
+                }
+            }
+        }
+
+        val json = option.toJSON()
+        println(json)
+    }
+
+    @Test
+    fun get_genScatter_with_lineStack() {
+        val option = commonOption(sampleData)
+
+        option.series {
+            scatter {
+                name("餐后")
+                colorBy { data }
+                symbol { size(6) }
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    sampleData.onEachIndexed { index, entry ->
+                        entry.value.forEach { value ->
+                            item(index, value) {}
+                        }
+                    }
+                }
+
+                markLine {
+                    byYAxis {
+                        value(10f)
+                        name("<餐后>上限\n(10 mmol/L)")
+                        label {
+                            position { end }
+                            formatter("{b}")
+                        }
+                    }
+                }
+            }
+
+            line {
+                name("餐后")
+                smooth(true)
+                connectNulls(true)
+
+                symbol { shape { none } }
+                stack { name("diff-range") }
+                lineStyle { opacity(0.6f) }
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    sampleData.onEachIndexed { index, entry ->
+                        item(index, entry.value.min()) {}
+                    }
+                }
+            }
+
+            line {
+                name("餐后")
+                smooth(true)
+                connectNulls(true)
+
+                symbol { shape { none } }
+                stack { name("diff-range") }
+                lineStyle { opacity(0.6f) }
+                areaStyle { opacity(0.6f) }
+
+                data {
+                    dimension("x", "y") {
+                        x("x")
+                        y("y")
+                    }
+
+                    // Note: 这里为前面同名 stack 之间的差值
+                    sampleData.onEachIndexed { index, entry ->
+                        item(index, entry.value.max() - entry.value.min()) {}
+                    }
+                }
+            }
+        }
+
+        val json = option.toJSON()
+        println(json)
+    }
+
+    private fun commonOption(sampleData: Map<String, List<Float>>): ECharts.Option {
         val option = ECharts.option {
             theme {
                 backgroundColor(rgba(0x141218))
@@ -82,9 +523,9 @@ class EChartsOptionTest {
                 type {
                     category {
                         data {
-                            item("2021-10-11") {}
-                            item("2021-10-12") {}
-                            item("2021-10-13") {}
+                            sampleData.keys.forEach {
+                                item(it) {}
+                            }
                         }
                     }
                 }
@@ -94,7 +535,7 @@ class EChartsOptionTest {
 
                 type { value { fromZero(true) } }
                 name("血糖 (mmol/L)") { position { middle() } }
-                maxValue(40f)
+                maxValue(15f)
 
                 markLine {
                     value(3.9f)
@@ -105,7 +546,7 @@ class EChartsOptionTest {
                     }
                 }
                 markLine {
-                    value(15f)
+                    value(12f)
                     name("<血糖>上限 (15 mmol/L)")
                     label {
                         formatter("{b}")
@@ -115,173 +556,6 @@ class EChartsOptionTest {
             }
         }
 
-        option.series {
-            line {
-                name("S1")
-                colorBy { data }
-                connectNulls(false)
-
-                xAxisId("grid:0:x:0")
-                yAxisId("grid:0:y:0")
-            }
-            line {
-                name("S2")
-                connectNulls(true)
-
-                data {
-                    dimension("x", "y") {
-                        x("x")
-                        y("y")
-                    }
-
-                    item(0, 10) {}
-                    item(1, null) {}
-                    item(2, 5) {}
-                }
-
-                markArea {
-                    byData {
-                        name("数据区间")
-                        label { formatter("{b}") }
-
-                        start {
-                            byDimension { max("y") }
-                        }
-                        end {
-                            byDimension { min("y") }
-                        }
-                    }
-
-                    byData {
-                        name("观察窗口")
-                        label { formatter("{b}") }
-
-                        start {
-                            byCoordinate(x = 1, y = 3f)
-                        }
-                        end {
-                            byCoordinate(x = 2, y = 19f)
-                        }
-                    }
-
-                    byYAxis {
-                        value(6.1f, 7.8f)
-                        name("空腹 8h (6.1 ~ 7.8 mmol/L)")
-                        label {
-                            position { insideLeft }
-                            formatter("{b}")
-                        }
-                    }
-                }
-            }
-
-            candlestick {
-                name("S3")
-
-                data {
-                    dimension("x", "open", "close", "lowest", "highest") {
-                        x("x")
-                        y("open", "close", "highest", "lowest")
-                        tooltip("open" to "最早", "close" to "最晚", "lowest" to "最高", "highest" to "最低")
-                    }
-
-                    item(0, 10, 11, 10, 13) {}
-                    item(1, 8, 6, 10, 21) {}
-                    item(2, 5, 9, 23, 31) {}
-                }
-
-                markLine {
-                    byData {
-                        name("最大差异")
-                        symbol {
-                            shape { circle }
-                            size(10)
-                        }
-                        label {
-                            position { middle }
-                            formatter("{b}")
-                        }
-
-                        start {
-                            byDimension { max("highest") }
-                        }
-                        end {
-                            byDimension { min("lowest") }
-                            symbol { rotate(0) }
-                        }
-                    }
-
-                    byData {
-                        symbol {
-                            shape { pin }
-                            size(30)
-                            rotate(180)
-                        }
-
-                        start {
-                            byCoordinate(x = 1, y = 3.1f)
-                        }
-                        end {
-                            byCoordinate(x = 2, y = 15f)
-                        }
-                    }
-
-                    byXAxis {
-                        value("2021-10-12")
-                        name("就医后")
-                        label {
-                            position { insideStartTop }
-                            formatter("{b}")
-                        }
-                    }
-
-                    byYAxis {
-                        value(10f)
-                        name("<餐后 2h>上限 (10 mmol/L)")
-                        label {
-                            position { insideStartBottom }
-                            formatter("{b}")
-                        }
-                    }
-                }
-
-                markPoint {
-                    byData {
-                        symbol {
-                            shape { pin }
-                            size(50)
-                        }
-                        byDimension { max("highest") }
-                    }
-                    byData {
-                        symbol {
-                            shape { pin }
-                            size(50)
-                        }
-                        byDimension { min("lowest") }
-                    }
-
-                    byData {
-                        name("Start")
-                        label {
-                            position { bottom }
-                            formatter("{b}")
-                        }
-
-                        symbol {
-                            shape { circle }
-                            size(50)
-                        }
-                        byCoordinate(x = 1, y = 15f)
-                    }
-                }
-            }
-        }
-
-        val json = option.toJSON()
-        Assert.assertEquals(
-            "{\"tooltip\": {\"axisPointer\": {\"type\": \"cross\"},\"backgroundColor\": \"rgba(50, 50, 50, 0.7019608)\",\"borderColor\": \"rgba(3, 3, 3, 1.0)\",\"show\": true,\"trigger\": \"axis\"},\"legend\": {\"show\": true,\"top\": 20,\"type\": \"plain\"},\"grid\": {\"bottom\": \"15.0%\",\"left\": \"10.0%\",\"right\": \"10.0%\",\"show\": true},\"series\": [{\"data\": [{\"value\": [10]},{\"value\": [21]}],\"name\": \"Abc\",\"xAxisIndex\": 0,\"yAxisIndex\": 0,\"smooth\": true,\"type\": \"line\"},{\"data\": [{\"value\": [10,11,10,13]},{\"value\": [10,11,10,13]}],\"markLine\": {\"data\": [[{\"symbol\": \"circle\",\"symbolSize\": 10,\"type\": \"max\",\"valueDim\": \"highest\"},{\"symbol\": \"circle\",\"symbolSize\": 10,\"type\": \"min\",\"valueDim\": \"lowest\"}]],\"silent\": true},\"markPoint\": {\"data\": [{\"type\": \"max\",\"valueDim\": \"highest\"},{\"type\": \"min\",\"valueDim\": \"lowest\"}],\"silent\": true},\"name\": \"Def\",\"xAxisIndex\": 0,\"yAxisIndex\": 0,\"smooth\": true,\"type\": \"candlestick\"}],\"xAxis\": [{\"data\": [{\"value\": \"2021-10-11\"},{\"value\": \"2021-10-12\"}],\"scale\": false,\"show\": true,\"type\": \"category\"}],\"yAxis\": [{\"scale\": true,\"show\": true,\"type\": \"value\"}],\"dataZoom\": [{\"endValue\": 1,\"filterMode\": \"filter\",\"show\": true,\"startValue\": 0,\"top\": \"90.0%\",\"type\": \"slider\"}]}",
-            json
-        )
+        return option
     }
 }

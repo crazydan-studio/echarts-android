@@ -23,8 +23,8 @@ import org.crazydan.studio.android.echarts.ECharts
  */
 @Composable
 fun ECharts(
-    option: ECharts.Option,
     modifier: Modifier = Modifier,
+    option: ECharts.Option,
     useDarkTheme: Boolean = false,
 ) {
     var isChartReady by remember { mutableStateOf(false) }
