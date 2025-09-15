@@ -142,7 +142,7 @@ open class SeriesHolder(
     var markPoint: MarkPoint? = null,
 
     var lineStyle: SeriesLineStyle? = null,
-    var areaStyle: SeriesAreaStyle? = null,
+    var areaStyle: SeriesItemStyle? = null,
 ) : JSONable
 
 data class SeriesDimension(
@@ -323,8 +323,8 @@ class SeriesLineStyleScope {
 }
 
 @EChartsOption
-class SeriesAreaStyle() : JSONable {
-    private val holder = SeriesAreaStyleHolder()
+class SeriesItemStyle() : JSONable {
+    private val holder = SeriesItemStyleHolder()
 
     override fun toJSON(): String = holder.toJSON()
 
@@ -339,7 +339,7 @@ class SeriesAreaStyle() : JSONable {
     }
 }
 
-data class SeriesAreaStyleHolder(
+data class SeriesItemStyleHolder(
     var color: Color? = null,
     var opacity: Float? = null,
 ) : JSONable

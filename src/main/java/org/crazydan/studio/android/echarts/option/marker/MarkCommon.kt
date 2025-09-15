@@ -3,6 +3,8 @@ package org.crazydan.studio.android.echarts.option.marker
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
 import org.crazydan.studio.android.echarts.option.Label
+import org.crazydan.studio.android.echarts.option.SeriesItemStyle
+import org.crazydan.studio.android.echarts.option.SeriesLineStyle
 
 /**
  *
@@ -38,6 +40,9 @@ open class MarkWithNameSymbol(
 
 open class MarkWithLabelHolder(
     var label: Label? = null,
+
+    var itemStyle: SeriesItemStyle? = null,
+    var lineStyle: SeriesLineStyle? = null,
 ) : JSONable
 
 open class MarkWithSymbolHolder(

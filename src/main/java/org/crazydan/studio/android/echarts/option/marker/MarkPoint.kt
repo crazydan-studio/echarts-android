@@ -2,6 +2,7 @@ package org.crazydan.studio.android.echarts.option.marker
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.SeriesItemStyle
 
 /**
  *
@@ -17,6 +18,11 @@ class MarkPoint() : JSONable {
     /** 图形是否不响应和触发鼠标事件 */
     fun silent(value: Boolean) {
         holder.silent = value
+    }
+
+    /** 点样式 */
+    fun style(block: SeriesItemStyle.() -> Unit) {
+        holder.itemStyle = SeriesItemStyle().apply(block)
     }
 
     /** 数据点配置 */

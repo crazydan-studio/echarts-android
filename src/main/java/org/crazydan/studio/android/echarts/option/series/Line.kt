@@ -2,7 +2,7 @@ package org.crazydan.studio.android.echarts.option.series
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.option.Series
-import org.crazydan.studio.android.echarts.option.SeriesAreaStyle
+import org.crazydan.studio.android.echarts.option.SeriesItemStyle
 import org.crazydan.studio.android.echarts.option.SeriesHolder
 import org.crazydan.studio.android.echarts.option.SeriesLineStyle
 
@@ -42,8 +42,8 @@ class SeriesLine(
     }
 
     /** 区域填充样式配置。设置后显示成区域面积图 */
-    fun areaStyle(block: SeriesAreaStyle.() -> Unit) {
-        holder.areaStyle = SeriesAreaStyle().apply(block)
+    fun areaStyle(block: SeriesItemStyle.() -> Unit) {
+        holder.areaStyle = SeriesItemStyle().apply(block)
     }
 }
 
