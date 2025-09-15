@@ -1,11 +1,13 @@
 var myChart;
+var myChartTheme;
 var myChartElement = 'container';
 var myChartWrapper = window.__ChartWrapper__;
 
 function initChart(useDarkTheme) {
     var dom = document.getElementById(myChartElement);
 
-    myChart = echarts.init(dom, useDarkTheme ? 'dark' : null);
+    myChartTheme = useDarkTheme ? 'dark' : null;
+    myChart = echarts.init(dom, myChartTheme);
 
     // https://echarts.apache.org/en/api.html#events.rendered
     myChart.on('rendered', function () {
@@ -17,8 +19,16 @@ function initChart(useDarkTheme) {
 
 /** 更新图表配置及数据 */
 function updateChartOptions(optionJson) {
-    console.log(optionJson);
-    var option = JSON.parse(optionJson);
+    //console.log(optionJson);
+    var option = JSON.parse(optionJson, function (key, value) {
+        if (key == 'formatter'
+            && typeof value === 'string'
+            && value.startsWith('function')
+        ) {
+            return new Function('return ' + value)();
+        }
+        return value;
+    });
 
     // https://echarts.apache.org/en/option.html#title
     // https://echarts.apache.org/en/api.html#echartsInstance.setOption
@@ -29,7 +39,7 @@ function updateChartOptions(optionJson) {
 function createTooltip_v1(title, data) {
     var html = [];
 
-    html.push('<div class="echarts-tooltip container">');
+    html.push('<div class="echarts-tooltip container ' + (myChartTheme || '') + '">');
     html.push('  <div class="container">');
     html.push('    <div class="label axis-value-label">');
     html.push('      ' + title);
@@ -57,12 +67,13 @@ function createTooltip_v1(title, data) {
 
 function createTooltip_v1_renderItem(item, markerClass) {
     var html = [];
+    var value = item.value || (item.data ? '' : '-');
 
     html.push('      <div class="container">');
     html.push('        <div class="container">');
     html.push('          <span class="' + markerClass + '" style="background-color: ' + item.color + ';"></span>');
     html.push('          <span class="label series-name">' + item.name + '</span>');
-    html.push('          <span class="label series-value">' + (item.value || '-') + '</span>');
+    html.push('          <span class="label series-value">' + value + '</span>');
     html.push('        </div>');
     html.push('      </div>');
 

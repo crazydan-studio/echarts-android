@@ -35,6 +35,19 @@ class Tooltip : JSONable {
     fun axisPointer(block: AxisPointer.() -> Unit) {
         holder.axisPointer = AxisPointer().apply(block)
     }
+
+    /** 文本格式化器 */
+    fun formatter(value: String) {
+        holder.formatter = value
+    }
+
+    /** 提示框位置 */
+    fun position(block: TooltipPosition.() -> Unit) {
+        val p = mutableListOf<Size?>(null, null)
+        TooltipPosition(p).block()
+
+        holder.position = p
+    }
 }
 
 /**
@@ -66,6 +79,7 @@ class AxisPointer : JSONable {
 
 data class TooltipHolder(
     var show: Boolean = true,
+    var position: List<Size?>? = null,
 
     var trigger: TriggerType = TriggerType.Item,
     var axisPointer: AxisPointer? = null,
@@ -77,6 +91,31 @@ data class AxisPointerHolder(
     var type: Type? = null,
     var label: Label? = null,
 ) : JSONable
+
+
+@EChartsOption
+class TooltipPosition(
+    private val holder: MutableList<Size?>,
+) : SizeScope {
+
+    /**
+     * 放置于容器的左侧
+     *
+     * @param value 偏移量
+     */
+    fun left(value: Size = 0.px) {
+        holder.add(0, value)
+    }
+
+    /**
+     * 放置于容器的顶部
+     *
+     * @param value 偏移量
+     */
+    fun top(value: Size = 0.px) {
+        holder.add(1, value)
+    }
+}
 
 class TriggerTypeScope {
     /** 数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。默认为该触发方式 */

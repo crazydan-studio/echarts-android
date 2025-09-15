@@ -181,7 +181,7 @@ class SeriesDataList(
     }
 
     /** 各项数据的列值，其列及其总数必须与 [dimension] 定义的列相对应 */
-    fun item(vararg value: Number?, block: SeriesData.() -> Unit) {
+    fun item(vararg value: Any?, block: SeriesData.() -> Unit) {
         val data = SeriesDataHolder(value.toList())
         items.add(
             SeriesData(data).apply(block)
@@ -199,7 +199,7 @@ class SeriesData(
 }
 
 data class SeriesDataHolder(
-    var value: List<Number?>,
+    var value: List<Any?>,
     var itemStyle: Any? = null,
 ) : JSONable
 
