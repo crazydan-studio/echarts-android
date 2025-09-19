@@ -37,6 +37,10 @@ function updateChartOptions(optionJson) {
 
 /** 创建浮动提示 */
 function createTooltip_v1(title, data) {
+    if (data.length == 0) {
+        return null;
+    }
+
     var html = [];
 
     html.push('<div class="echarts-tooltip container ' + (myChartTheme || '') + '">');
