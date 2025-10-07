@@ -9,6 +9,8 @@ import org.crazydan.studio.android.echarts.option.SeriesItemStyle
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2025-09-12
  */
+typealias MarkAreaByAxisFactory = MarkAreaByAxis.() -> Unit
+
 @EChartsOption
 class MarkArea() : JSONable {
     private val holder = MarkAreaHolder()
@@ -20,7 +22,7 @@ class MarkArea() : JSONable {
         holder.silent = value
     }
 
-    /** 区域样式 */
+    /** （全局）区域样式 */
     fun style(block: SeriesItemStyle.() -> Unit) {
         holder.itemStyle = SeriesItemStyle().apply(block)
     }
@@ -48,7 +50,7 @@ class MarkArea() : JSONable {
     }
 
     /** 与 x 轴垂直的标域配置 */
-    fun byXAxis(block: MarkAreaByAxis.() -> Unit) {
+    fun byXAxis(block: MarkAreaByAxisFactory) {
         val value = mutableListOf<Any>()
         val start = MarkDataPointHolder()
         val end = MarkDataPointHolder()
@@ -66,7 +68,7 @@ class MarkArea() : JSONable {
     }
 
     /** 与 y 轴垂直的标域配置 */
-    fun byYAxis(block: MarkAreaByAxis.() -> Unit) {
+    fun byYAxis(block: MarkAreaByAxisFactory) {
         val value = mutableListOf<Any>()
         val start = MarkDataPointHolder()
         val end = MarkDataPointHolder()
@@ -103,6 +105,11 @@ open class MarkAreaByXxx(
     /** 标签配置 */
     fun label(block: MarkPointLabel.() -> Unit) {
         holder.label = MarkPointLabel().apply(block)
+    }
+
+    /** 样式 */
+    fun style(block: SeriesItemStyle.() -> Unit) {
+        holder.itemStyle = SeriesItemStyle().apply(block)
     }
 }
 

@@ -87,6 +87,11 @@ open class MarkLineByXxx(
     fun label(block: MarkLineLabel.() -> Unit) {
         holder.label = MarkLineLabel().apply(block)
     }
+
+    /** 样式 */
+    fun style(block: SeriesLineStyle.() -> Unit) {
+        holder.lineStyle = SeriesLineStyle().apply(block)
+    }
 }
 
 @EChartsOption

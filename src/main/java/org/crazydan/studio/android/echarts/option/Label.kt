@@ -1,5 +1,6 @@
 package org.crazydan.studio.android.echarts.option
 
+import androidx.annotation.FloatRange
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
 
@@ -24,9 +25,15 @@ open class Label(
     fun formatter(value: String) {
         holder.formatter = value
     }
+
+    /** 旋转角度 */
+    fun rotate(@FloatRange(from = -90.0, to = 90.0) value: Float) {
+        holder.rotate = value
+    }
 }
 
 open class LabelHolder(
     var show: Boolean = true,
     var formatter: String? = null,
+    var rotate: Float? = null,
 ) : JSONable

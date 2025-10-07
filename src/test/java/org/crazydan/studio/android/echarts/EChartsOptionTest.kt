@@ -518,7 +518,7 @@ class EChartsOptionTest {
 
             xAxis(id = "grid:0:x:0") {
                 position { bottom(5.px) }
-                axisTick { alignWithLabel(true) }
+                tick { alignWithLabel(true) }
 
                 type {
                     category {

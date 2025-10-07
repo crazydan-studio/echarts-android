@@ -279,7 +279,7 @@ class SeriesSymbolShapeScope {
 }
 
 @EChartsOption
-class SeriesLineStyle() : JSONable {
+class SeriesLineStyle() : JSONable, ColorScope {
     private val holder = SeriesLineStyleHolder()
 
     enum class Type {
@@ -323,7 +323,7 @@ class SeriesLineStyleScope {
 }
 
 @EChartsOption
-class SeriesItemStyle() : JSONable {
+class SeriesItemStyle() : JSONable, ColorScope {
     private val holder = SeriesItemStyleHolder()
 
     override fun toJSON(): String = holder.toJSON()

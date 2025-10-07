@@ -2,8 +2,11 @@ package org.crazydan.studio.android.echarts.option.coord
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.Label
+import org.crazydan.studio.android.echarts.option.LabelHolder
 import org.crazydan.studio.android.echarts.option.Size
 import org.crazydan.studio.android.echarts.option.SizeScope
+import org.crazydan.studio.android.echarts.option.marker.MarkAreaByAxisFactory
 import org.crazydan.studio.android.echarts.option.marker.MarkLineByAxisFactory
 
 /**
@@ -25,6 +28,7 @@ class GridXAxis(
     private val id: String?,
     private val gridId: String?,
     private val markLinesHolder: MutableList<MarkLineByAxisFactory>,
+    private val markAreasHolder: MutableList<MarkAreaByAxisFactory>,
     private val axisHolder: GridAxisHolder = GridAxisHolder(id = id, gridId = gridId),
 ) : GridAxis(axisHolder) {
 
@@ -40,6 +44,11 @@ class GridXAxis(
     /** 在 x 轴上的标记线配置 */
     fun markLine(block: MarkLineByAxisFactory) {
         markLinesHolder.add(block)
+    }
+
+    /** 在 x 轴上的标域配置 */
+    fun markArea(block: MarkAreaByAxisFactory) {
+        markAreasHolder.add(block)
     }
 }
 
@@ -121,8 +130,13 @@ open class GridAxis(
     }
 
     /** [坐标轴刻度配置](https://echarts.apache.org/zh/option.html#xAxis.axisTick) */
-    fun axisTick(block: GridAxisTick.() -> Unit) {
+    fun tick(block: GridAxisTick.() -> Unit) {
         holder.axisTick = GridAxisTick().apply(block)
+    }
+
+    /** [坐标轴标签配置](https://echarts.apache.org/zh/option.html#xAxis.axisLabel) */
+    fun label(block: GridAxisLabel.() -> Unit) {
+        holder.axisLabel = GridAxisLabel().apply(block)
     }
 }
 
@@ -146,6 +160,7 @@ open class GridAxisHolder(
     var data: List<GridAxisData>? = null,
 
     var axisTick: GridAxisTick? = null,
+    var axisLabel: GridAxisLabel? = null,
 ) : JSONable
 
 @EChartsOption
@@ -313,6 +328,15 @@ data class GridAxisTickHolder(
     var show: Boolean = true,
     var alignWithLabel: Boolean? = null,
 ) : JSONable
+
+@EChartsOption
+class GridAxisLabel(
+    private val holder: GridAxisLabelHolder = GridAxisLabelHolder(),
+) : Label(holder) {
+}
+
+class GridAxisLabelHolder(
+) : LabelHolder()
 
 @EChartsOption
 class GridAxisDataListByType(

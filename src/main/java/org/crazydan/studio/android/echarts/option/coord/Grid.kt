@@ -6,6 +6,7 @@ import org.crazydan.studio.android.echarts.JSONable
 import org.crazydan.studio.android.echarts.option.Margin
 import org.crazydan.studio.android.echarts.option.MarginHolder
 import org.crazydan.studio.android.echarts.option.SeriesList
+import org.crazydan.studio.android.echarts.option.marker.MarkAreaByAxisFactory
 import org.crazydan.studio.android.echarts.option.marker.MarkLineByAxisFactory
 
 /**
@@ -45,10 +46,12 @@ class Grid(
     /** [x 轴配置](https://echarts.apache.org/en/option.html#xAxis) */
     fun xAxis(id: String? = null, block: GridXAxis.() -> Unit) {
         val markLines = mutableListOf<MarkLineByAxisFactory>()
+        val markAreas = mutableListOf<MarkAreaByAxisFactory>()
         val axis = GridXAxis(
             id = id,
             gridId = holder.id,
             markLinesHolder = markLines,
+            markAreasHolder = markAreas,
         ).apply(block)
 
         axisHolder.addXAxis(axis)
@@ -59,6 +62,18 @@ class Grid(
                 markLine {
                     silent(true)
                     markLines.forEach { block ->
+                        byXAxis(block)
+                    }
+                }
+            }
+        }
+
+        if (markAreas.isNotEmpty()) {
+            SeriesList(axisHolder).line {
+                id?.let { xAxisId(it) }
+                markArea {
+                    silent(true)
+                    markAreas.forEach { block ->
                         byXAxis(block)
                     }
                 }
