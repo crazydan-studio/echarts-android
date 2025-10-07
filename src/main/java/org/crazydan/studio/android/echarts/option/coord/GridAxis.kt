@@ -2,6 +2,7 @@ package org.crazydan.studio.android.echarts.option.coord
 
 import org.crazydan.studio.android.echarts.EChartsOption
 import org.crazydan.studio.android.echarts.JSONable
+import org.crazydan.studio.android.echarts.option.ColorScope
 import org.crazydan.studio.android.echarts.option.Label
 import org.crazydan.studio.android.echarts.option.LabelHolder
 import org.crazydan.studio.android.echarts.option.Size
@@ -91,7 +92,7 @@ class GridYAxis(
 
 open class GridAxis(
     private val holder: GridAxisHolder,
-) : JSONable {
+) : JSONable, ColorScope {
 
     enum class Type {
         Value, Category, Time, Log
