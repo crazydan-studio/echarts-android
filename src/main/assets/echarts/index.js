@@ -23,7 +23,7 @@ function updateChartOptions(optionJson) {
     var option = JSON.parse(optionJson, function (key, value) {
         if (key == 'formatter'
             && typeof value === 'string'
-            && value.startsWith('function')
+            && value.trimLeft().startsWith('function ')
         ) {
             return new Function('return ' + value)();
         }
